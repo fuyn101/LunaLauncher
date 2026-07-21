@@ -134,6 +134,9 @@ bool YukariConnectPage::apply()
 void YukariConnectPage::retranslate()
 {
     ui->retranslateUi(this);
+    ui->comboBox_download_source->setItemText(0, tr("GitHub (Official)"));
+    ui->comboBox_download_source->setItemText(1, tr("Gitee (Mirror for China)"));
+    updateStatus();
 }
 
 void YukariConnectPage::openedImpl()
@@ -283,16 +286,16 @@ void YukariConnectPage::onOpenOnlineButtonClicked()
 
 void YukariConnectPage::onLicenseInfoButtonClicked()
 {
-    QString aboutText = tr(
-        "<h3>YukariConnect P2P Multiplayer</h3>"
-        "<p><b>P2P Multiplayer Solution</b></p>"
-        "<p>YukariConnect is a P2P multiplayer solution for Minecraft that allows players to connect without port forwarding or central servers.</p>"
-        "<h4>YukariConnect Project</h4>"
-        "<p><b>Developer:</b> AndreaFrederica  AuraElicase<br>"
-        "<b>Project URL:</b> <a href=\"https://github.com/ElicaseTech/YukariConnect\">https://github.com/ElicaseTech/YukariConnect</a></p>"
-        "<h4>License</h4>"
-        "<p>YukariConnect is licensed under the <b>Mozilla Public License 2.0 (MPL-2.0)</b>.</p>"
-    );
+    const QString projectUrl = QStringLiteral("https://github.com/ElicaseTech/YukariConnect");
+    QString aboutText =
+        tr("<h3>YukariConnect P2P Multiplayer</h3>") +
+        tr("<p><b>P2P Multiplayer Solution</b></p>") +
+        tr("<p>YukariConnect is a P2P multiplayer solution for Minecraft that allows players to connect without port forwarding or central servers.</p>") +
+        tr("<h4>YukariConnect Project</h4>") +
+        tr("<p><b>Developer:</b> %1<br>").arg(QStringLiteral("AndreaFrederica  AuraElicase")) +
+        tr("<b>Project URL:</b> <a href=\"%1\">%2</a></p>").arg(projectUrl, projectUrl) +
+        tr("<h4>License</h4>") +
+        tr("<p>YukariConnect is licensed under the <b>Mozilla Public License 2.0 (MPL-2.0)</b>.</p>");
 
     QMessageBox::about(this, tr("About YukariConnect"), aboutText);
 }

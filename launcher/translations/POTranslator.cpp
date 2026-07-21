@@ -290,6 +290,12 @@ QString POTranslator::translate(const char* context, const char* sourceText, con
             }
             return entry.text;
         }
+
+        auto fallbackKey = QByteArray("|") + QByteArray(sourceText) + "@" + QByteArray(disambiguation);
+        iter = d->mapping_disambiguatrion.find(fallbackKey);
+        if (iter != d->mapping_disambiguatrion.end()) {
+            return iter->text;
+        }
     }
     auto key = QByteArray(context) + "|" + QByteArray(sourceText);
     auto iter = d->mapping.find(key);
@@ -302,6 +308,11 @@ QString POTranslator::translate(const char* context, const char* sourceText, con
             qDebug() << "Translation entry is fuzzy:" << key << "->" << entry.text;
         }
         return entry.text;
+    }
+    auto fallbackKey = QByteArray("|") + QByteArray(sourceText);
+    iter = d->mapping.find(fallbackKey);
+    if (iter != d->mapping.end()) {
+        return iter->text;
     }
     return QString();
 }

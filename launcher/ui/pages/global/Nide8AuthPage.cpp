@@ -52,6 +52,7 @@ bool Nide8AuthPage::apply()
 void Nide8AuthPage::retranslate()
 {
     ui->retranslateUi(this);
+    updateStatus();
 }
 
 void Nide8AuthPage::refreshStatus()

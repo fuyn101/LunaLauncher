@@ -522,6 +522,698 @@ msgstr "YukariConnect 服务器关闭超时，假定已停止。"
 msgid "Stopped"
 msgstr "已停止"
 
+#: TerracottaPage.ui
+msgid "Startup Mode:"
+msgstr "启动模式："
+
+#: TerracottaPage.ui
+msgid "Foreground (controllable) or HMCL-compatible (simulate HMCL)"
+msgstr "前台（可控）或 HMCL 兼容（模拟 HMCL）"
+
+#: TerracottaPage.cpp
+msgid "Foreground (Controllable)"
+msgstr "前台（可控）"
+
+#: TerracottaPage.cpp
+msgid "HMCL-compatible (Simulate HMCL)"
+msgstr "HMCL 兼容（模拟 HMCL）"
+
+#: TerracottaOnlinePanel.cpp
+msgid "Terracotta is not running."
+msgstr "Terracotta 未运行。"
+
+# ========================================================================
+# Shared authentication page fields
+# ========================================================================
+
+msgctxt "AuthlibInjectorPage"
+msgid "Status"
+msgstr "状态"
+
+msgctxt "AuthlibInjectorPage"
+msgid "Installed:"
+msgstr "已安装："
+
+msgctxt "AuthlibInjectorPage"
+msgid "Checking..."
+msgstr "检查中..."
+
+msgctxt "AuthlibInjectorPage"
+msgid "Version:"
+msgstr "版本："
+
+msgctxt "AuthlibInjectorPage"
+msgid "File Size:"
+msgstr "文件大小："
+
+msgctxt "AuthlibInjectorPage"
+msgid "Location:"
+msgstr "位置："
+
+msgctxt "AuthlibInjectorPage"
+msgid "Download"
+msgstr "下载"
+
+msgctxt "AuthlibInjectorPage"
+msgid "Download / Update"
+msgstr "下载 / 更新"
+
+msgctxt "AuthlibInjectorPage"
+msgid "Delete"
+msgstr "删除"
+
+msgctxt "Nide8AuthPage"
+msgid "Status"
+msgstr "状态"
+
+msgctxt "Nide8AuthPage"
+msgid "Installed:"
+msgstr "已安装："
+
+msgctxt "Nide8AuthPage"
+msgid "Checking..."
+msgstr "检查中..."
+
+msgctxt "Nide8AuthPage"
+msgid "File Size:"
+msgstr "文件大小："
+
+msgctxt "Nide8AuthPage"
+msgid "Location:"
+msgstr "位置："
+
+msgctxt "Nide8AuthPage"
+msgid "Download"
+msgstr "下载"
+
+msgctxt "Nide8AuthPage"
+msgid "Download / Update"
+msgstr "下载 / 更新"
+
+msgctxt "Nide8AuthPage"
+msgid "Delete"
+msgstr "删除"
+
+# ========================================================================
+# Aria2Page / Aria2MonitorPanel / Aria2Manager
+# ========================================================================
+
+msgctxt "Aria2Page"
+msgid "Download Backend"
+msgstr "下载后端"
+
+msgctxt "Aria2Page"
+msgid "Use aria2 for direct file downloads"
+msgstr "使用 aria2 下载直链文件"
+
+msgctxt "Aria2Page"
+msgid "Automatically download aria2 when it is missing"
+msgstr "缺少 aria2 时自动下载"
+
+msgctxt "Aria2Page"
+msgid "Fall back to the built-in downloader when aria2 is unavailable"
+msgstr "aria2 不可用时回退到内置下载器"
+
+msgctxt "Aria2Page"
+msgid "Browse..."
+msgstr "浏览..."
+
+msgctxt "Aria2Page"
+msgid "Detect"
+msgstr "检测"
+
+msgctxt "Aria2Page"
+msgid "Auto Setup"
+msgstr "自动配置"
+
+msgctxt "Aria2Page"
+msgid "Download"
+msgstr "下载"
+
+msgctxt "Aria2Page"
+msgid "Remove Downloaded"
+msgstr "删除已下载版本"
+
+msgctxt "Aria2Page"
+msgid "aria2c path:"
+msgstr "aria2c 路径："
+
+msgctxt "Aria2Page"
+msgid "Manage:"
+msgstr "管理："
+
+msgctxt "Aria2Page"
+msgid "System:"
+msgstr "系统："
+
+msgctxt "Aria2Page"
+msgid "Downloaded:"
+msgstr "已下载："
+
+msgctxt "Aria2Page"
+msgid "Using:"
+msgstr "当前使用："
+
+msgctxt "Aria2Page"
+msgid "Transfer Options"
+msgstr "传输选项"
+
+msgctxt "Aria2Page"
+msgid "Follow launcher download limits"
+msgstr "遵循启动器下载限制"
+
+msgctxt "Aria2Page"
+msgid "Max active downloads:"
+msgstr "最大活动下载数："
+
+msgctxt "Aria2Page"
+msgid "Connections per server:"
+msgstr "每个服务器的连接数："
+
+msgctxt "Aria2Page"
+msgid "Split count:"
+msgstr "分片数量："
+
+msgctxt "Aria2Page"
+msgid "Minimum split size:"
+msgstr "最小分片大小："
+
+msgctxt "Aria2Page"
+msgid "File allocation:"
+msgstr "文件分配方式："
+
+msgctxt "Aria2Page"
+msgid "Resume partial aria2 downloads"
+msgstr "继续未完成的 aria2 下载"
+
+msgctxt "Aria2Page"
+msgid "RPC port:"
+msgstr "RPC 端口："
+
+msgctxt "Aria2Page"
+msgid "Monitor refresh:"
+msgstr "监控刷新间隔："
+
+msgctxt "Aria2Page"
+msgid "Random"
+msgstr "随机"
+
+msgctxt "Aria2Page"
+msgid " ms"
+msgstr " 毫秒"
+
+msgctxt "Aria2Page"
+msgid "Proxy"
+msgstr "代理"
+
+msgctxt "Aria2Page"
+msgid "Use launcher proxy settings"
+msgstr "使用启动器代理设置"
+
+msgctxt "Aria2Page"
+msgid "None"
+msgstr "无"
+
+msgctxt "Aria2Page"
+msgid "aria2 proxy type:"
+msgstr "aria2 代理类型："
+
+msgctxt "Aria2Page"
+msgid "Host:"
+msgstr "主机："
+
+msgctxt "Aria2Page"
+msgid "Port:"
+msgstr "端口："
+
+msgctxt "Aria2Page"
+msgid "User:"
+msgstr "用户名："
+
+msgctxt "Aria2Page"
+msgid "Password:"
+msgstr "密码："
+
+msgctxt "Aria2Page"
+msgid "Advanced"
+msgstr "高级"
+
+msgctxt "Aria2Page"
+msgid "Extra aria2c arguments:"
+msgstr "额外 aria2c 参数："
+
+msgctxt "Aria2Page"
+msgid "--option=value, one argument per line"
+msgstr "--option=value，每行一个参数"
+
+msgctxt "Aria2Page"
+msgid "Select aria2c"
+msgstr "选择 aria2c"
+
+msgctxt "Aria2Page"
+msgid "Not found"
+msgstr "未找到"
+
+msgctxt "Aria2Page"
+msgid "Not available"
+msgstr "不可用"
+
+msgctxt "Aria2Page"
+#, qt-format
+msgid "Not installed (%1)"
+msgstr "未安装（%1）"
+
+msgctxt "Aria2Page"
+msgid "A usable aria2c executable was found."
+msgstr "已找到可用的 aria2c 可执行文件。"
+
+msgctxt "Aria2Page"
+msgid "aria2 was downloaded successfully."
+msgstr "aria2 下载成功。"
+
+msgctxt "Aria2MonitorPanel"
+msgid "aria2 Monitor"
+msgstr "aria2 监控"
+
+msgctxt "Aria2MonitorPanel"
+msgid "Start"
+msgstr "启动"
+
+msgctxt "Aria2MonitorPanel"
+msgid "Stop"
+msgstr "停止"
+
+msgctxt "Aria2MonitorPanel"
+msgid "Refresh"
+msgstr "刷新"
+
+msgctxt "Aria2MonitorPanel"
+msgid "Clear Finished"
+msgstr "清除已完成"
+
+msgctxt "Aria2MonitorPanel"
+msgid "Show finished"
+msgstr "显示已完成"
+
+msgctxt "Aria2MonitorPanel"
+msgid "Status"
+msgstr "状态"
+
+msgctxt "Aria2MonitorPanel"
+msgid "Progress"
+msgstr "进度"
+
+msgctxt "Aria2MonitorPanel"
+msgid "Speed"
+msgstr "速度"
+
+msgctxt "Aria2MonitorPanel"
+msgid "File"
+msgstr "文件"
+
+msgctxt "Aria2MonitorPanel"
+msgid "Error"
+msgstr "错误"
+
+msgctxt "Aria2MonitorPanel"
+msgid "unknown"
+msgstr "未知"
+
+msgctxt "Aria2MonitorPanel"
+#, qt-format
+msgid "aria2: %1"
+msgstr "aria2：%1"
+
+msgctxt "Net::Aria2Manager"
+msgid "Downloading aria2"
+msgstr "正在下载 aria2"
+
+msgctxt "Net::Aria2Manager"
+msgid "Installing aria2"
+msgstr "正在安装 aria2"
+
+msgctxt "Net::Aria2Manager"
+msgid "Not found"
+msgstr "未找到"
+
+msgctxt "Net::Aria2Manager"
+#, qt-format
+msgid "Failed to start: %1"
+msgstr "启动失败：%1"
+
+msgctxt "Net::Aria2Manager"
+#, qt-format
+msgid "Running on 127.0.0.1:%1"
+msgstr "正在 127.0.0.1:%1 上运行"
+
+msgctxt "Net::Aria2Manager"
+#, qt-format
+msgid "Stopped (exit code %1)"
+msgstr "已停止（退出码 %1）"
+
+msgctxt "Net::Aria2Manager"
+msgid "Stopped"
+msgstr "已停止"
+
+msgctxt "Net::Aria2Manager"
+msgid "aria2 crashed"
+msgstr "aria2 已崩溃"
+
+msgctxt "Net::Aria2Manager"
+msgid "aria2 RPC error"
+msgstr "aria2 RPC 错误"
+
+msgctxt "Net::Aria2Manager"
+msgid "aria2 stopped"
+msgstr "aria2 已停止"
+
+msgctxt "Net::Aria2Manager"
+msgid "aria2c was not found."
+msgstr "未找到 aria2c。"
+
+msgctxt "Net::Aria2Manager"
+msgid "Stop aria2 before removing the downloaded executable."
+msgstr "删除已下载的可执行文件前，请先停止 aria2。"
+
+# ========================================================================
+# Mod categories and validation
+# ========================================================================
+
+msgctxt "ModFolderPage"
+msgid "Categories"
+msgstr "分类"
+
+msgctxt "ModFolderPage"
+msgid "Create categories and assign selected mods"
+msgstr "创建分类并为所选 Mod 分配分类"
+
+msgctxt "ModFolderPage"
+msgid "Assign Selected Mods"
+msgstr "分配所选 Mod"
+
+msgctxt "ModFolderPage"
+msgid "No Category"
+msgstr "未分类"
+
+msgctxt "ModFolderPage"
+msgid "New Category..."
+msgstr "新建分类..."
+
+msgctxt "ModFolderPage"
+msgid "New Category"
+msgstr "新建分类"
+
+msgctxt "ModFolderPage"
+msgid "Category name:"
+msgstr "分类名称："
+
+msgctxt "ModFolderPage"
+msgid "A category with that name already exists."
+msgstr "已存在同名分类。"
+
+msgctxt "ModFolderPage"
+msgid "Rename Category..."
+msgstr "重命名分类..."
+
+msgctxt "ModFolderPage"
+msgid "Rename Category"
+msgstr "重命名分类"
+
+msgctxt "ModFolderPage"
+msgid "Delete Category"
+msgstr "删除分类"
+
+msgctxt "ModFolderPage"
+#, qt-format
+msgid "Delete the category '%1'? Its mods will become uncategorized."
+msgstr "删除分类“%1”？其中的 Mod 将变为未分类。"
+
+msgctxt "ModFolderPage"
+msgid "Move Category Up"
+msgstr "上移分类"
+
+msgctxt "ModFolderPage"
+msgid "Move Category Down"
+msgstr "下移分类"
+
+msgctxt "ModFolderPage"
+msgid "Validate Mods"
+msgstr "验证 Mod"
+
+msgctxt "ModFolderPage"
+msgid "Check installed mods for conflicts, missing dependencies and version mismatches"
+msgstr "检查已安装 Mod 的冲突、缺失依赖和版本不匹配"
+
+msgctxt "ModFolderPage"
+msgid "There are no mods to validate."
+msgstr "没有可验证的 Mod。"
+
+msgctxt "ModFolderPage"
+msgid "This instance type does not support mod validation."
+msgstr "此实例类型不支持 Mod 验证。"
+
+msgctxt "ModFolderPage"
+msgid "Validation failed."
+msgstr "验证失败。"
+
+msgctxt "ModCategoryProxyModel"
+msgid "Matching mods are temporarily expanded while searching."
+msgstr "搜索期间会临时展开匹配的 Mod。"
+
+msgctxt "ModCategoryProxyModel"
+msgid "Click to expand or collapse this category. Drop installed mods here to assign them."
+msgstr "点击展开或折叠此分类。将已安装的 Mod 拖放到此处即可分配。"
+
+msgctxt "ModCategoryProxyModel"
+msgid "The category file could not be loaded. It will not be overwritten."
+msgstr "无法加载分类文件，因此不会覆盖该文件。"
+
+msgctxt "ModCategoryProxyModel"
+msgid "The category file is read-only because it could not be loaded."
+msgstr "分类文件加载失败，当前处于只读状态。"
+
+msgctxt "ModCategoryProxyModel"
+msgid "Failed to save mod categories."
+msgstr "保存 Mod 分类失败。"
+
+msgctxt "ModCategoryProxyModel"
+msgid "Failed to save parsed mod identities to the category file."
+msgstr "无法将解析后的 Mod 标识保存到分类文件。"
+
+# ========================================================================
+# Additional Luna pages and runtime messages
+# ========================================================================
+
+msgctxt "TerracottaPage"
+msgid " lines"
+msgstr " 行"
+
+msgctxt "YukariConnectPage"
+msgid " lines"
+msgstr " 行"
+
+msgctxt "YukariConnectOnlinePanel"
+msgid "Export Log"
+msgstr "导出日志"
+
+msgid "Downloading aria2"
+msgstr "正在下载 aria2"
+
+msgid "Installing aria2"
+msgstr "正在安装 aria2"
+
+msgid "Automatic aria2 download is only available for Windows x64."
+msgstr "仅 Windows x64 支持自动下载 aria2。"
+
+msgid "Automatic aria2 download is not available on macOS. Install aria2 with Homebrew, MacPorts, or set a custom aria2c path."
+msgstr "macOS 不支持自动下载 aria2。请使用 Homebrew 或 MacPorts 安装 aria2，或设置自定义 aria2c 路径。"
+
+msgid "Automatic aria2 download is not available on this platform. Install aria2 with your package manager or set a custom aria2c path."
+msgstr "当前平台不支持自动下载 aria2。请使用系统包管理器安装 aria2，或设置自定义 aria2c 路径。"
+
+msgid "Failed to create a temporary directory for aria2."
+msgstr "无法为 aria2 创建临时目录。"
+
+msgid "Failed to create aria2 download file: %1"
+msgstr "无法创建 aria2 下载文件：%1"
+
+msgid "Failed to write aria2 archive: %1"
+msgstr "无法写入 aria2 压缩包：%1"
+
+msgid "Failed to download aria2: %1"
+msgstr "下载 aria2 失败：%1"
+
+msgid "Downloaded aria2 archive does not contain %1."
+msgstr "下载的 aria2 压缩包中不包含 %1。"
+
+msgid "Failed to open %1 from the aria2 archive."
+msgstr "无法打开 aria2 压缩包中的 %1。"
+
+msgid "Failed to read %1 from the aria2 archive."
+msgstr "无法读取 aria2 压缩包中的 %1。"
+
+msgid "Downloaded aria2 executable did not match the expected checksum."
+msgstr "下载的 aria2 可执行文件校验和不匹配。"
+
+msgid "Failed to create aria2 install directory."
+msgstr "无法创建 aria2 安装目录。"
+
+msgid "Failed to open %1 for writing: %2"
+msgstr "无法打开 %1 进行写入：%2"
+
+msgid "Failed to write %1: %2"
+msgstr "无法写入 %1：%2"
+
+msgid "Failed to install %1: %2"
+msgstr "无法安装 %1：%2"
+
+msgid "Failed to remove %1."
+msgstr "无法删除 %1。"
+
+msgid "%1 (exit code %2)"
+msgstr "%1（退出码 %2）"
+
+msgid "%1. Restart limit reached."
+msgstr "%1。已达到重启次数上限。"
+
+msgid "%1. Restarting aria2..."
+msgstr "%1。正在重启 aria2..."
+
+msgid "%1. Restart failed: %2"
+msgstr "%1。重启失败：%2"
+
+msgid "Cannot restart aria2 download: missing request data."
+msgstr "无法重启 aria2 下载：缺少请求数据。"
+
+msgid "Failed to restart aria2 download: %1"
+msgstr "重启 aria2 下载失败：%1"
+
+msgid "aria2 RPC error"
+msgstr "aria2 RPC 错误"
+
+msgid "Requesting %1"
+msgstr "正在请求 %1"
+
+msgid "Could not create folder for %1"
+msgstr "无法为 %1 创建文件夹"
+
+msgid "Downloading with aria2: %1"
+msgstr "正在使用 aria2 下载：%1"
+
+msgid "%1 /s"
+msgstr "%1/秒"
+
+msgid "aria2 download failed with status %1"
+msgstr "aria2 下载失败，状态为 %1"
+
+msgid "Could not open aria2 output file %1: %2"
+msgstr "无法打开 aria2 输出文件 %1：%2"
+
+msgid "Could not move aria2 output file from %1 to %2"
+msgstr "无法将 aria2 输出文件从 %1 移动到 %2"
+
+msgid "EasyTier crashed (guest)"
+msgstr "EasyTier 已崩溃（访客）"
+
+msgid "EasyTier crashed (host)"
+msgstr "EasyTier 已崩溃（主机）"
+
+msgid "Error: EasyTier process crashed. Reason: %1"
+msgstr "错误：EasyTier 进程已崩溃。原因：%1"
+
+msgid "Try restarting the Terracotta server."
+msgstr "请尝试重启 Terracotta 服务器。"
+
+msgid "Resetting to idle state..."
+msgstr "正在重置为空闲状态..."
+
+msgid "Successfully reset to idle state."
+msgstr "已成功重置为空闲状态。"
+
+msgid "Failed to reset to idle state. You may need to restart the server."
+msgstr "无法重置为空闲状态。您可能需要重启服务器。"
+
+msgid "Connected to Terracotta server at: %1 (Port: %2)"
+msgstr "已连接到 Terracotta 服务器：%1（端口：%2）"
+
+msgid "Not connected to Terracotta server"
+msgstr "未连接到 Terracotta 服务器"
+
+msgid "<p><i>Translation: \"Your program's interaction with an unmodified copy of this work through the inter-process communication interfaces provided by this work (such as HTTP APIs) does not constitute a derivative work.\"</i></p>"
+msgstr "<p><i>译文：“您的程序通过本作品提供的进程间通信接口（例如 HTTP API）与未经修改的本作品副本进行交互，不构成衍生作品。”</i></p>"
+
+msgid "<h4>Integration Notice</h4>"
+msgstr "<h4>集成说明</h4>"
+
+msgid "<p>This integration communicates with the standalone Terracotta binary via its HTTP API only, which is explicitly permitted under Terracotta's license exception.</p>"
+msgstr "<p>此集成仅通过 HTTP API 与独立的 Terracotta 程序通信，Terracotta 的许可证例外条款明确允许这种方式。</p>"
+
+msgid "<p><b>Note:</b> This is a temporary solution. A future version will replace this with a custom implementation.</p>"
+msgstr "<p><b>注意：</b>这是一个临时方案，未来版本将使用自定义实现替代。</p>"
+
+msgid "WebSocket connected. Waiting for server to push state updates..."
+msgstr "WebSocket 已连接，正在等待服务器推送状态更新..."
+
+msgid "Failed to connect to YukariConnect server."
+msgstr "连接 YukariConnect 服务器失败。"
+
+msgid "YukariConnect server URL not available. Please start server first."
+msgstr "YukariConnect 服务器 URL 不可用。请先启动服务器。"
+
+msgid "Failed to join room. Check room code and try again."
+msgstr "加入房间失败。请检查房间代码后重试。"
+
+msgid "Failed to join room. The room code may be invalid or room is full."
+msgstr "无法加入房间。房间代码可能无效或房间已满。"
+
+msgid "Are you sure you want to stop YukariConnect server?\n\nThis will gracefully shut down the server and close all connections."
+msgstr "确定要停止 YukariConnect 服务器吗？\n\n这将正常关闭服务器并断开所有连接。"
+
+msgid "Are you sure you want to restart YukariConnect server?\n\nThis will disconnect all active connections."
+msgstr "确定要重启 YukariConnect 服务器吗？\n\n这将断开所有活动连接。"
+
+msgid "Start YukariConnect server"
+msgstr "启动 YukariConnect 服务器"
+
+msgid "Gracefully stop YukariConnect server"
+msgstr "正常停止 YukariConnect 服务器"
+
+msgid "Try restarting YukariConnect server."
+msgstr "请尝试重启 YukariConnect 服务器。"
+
+msgid "Open your Minecraft world, press Esc, and click 'Open to LAN' to start LAN server."
+msgstr "打开 Minecraft 世界，按 Esc 键，然后点击“对局域网开放”以启动 LAN 服务器。"
+
+msgid "Setting up connection to Minecraft server..."
+msgstr "正在建立与 Minecraft 服务器的连接..."
+
+msgid "No Logs"
+msgstr "没有日志"
+
+msgid "No logs to export."
+msgstr "没有可导出的日志。"
+
+msgid "Export Logs"
+msgstr "导出日志"
+
+msgid "Text Files (*.txt);;All Files (*.*)"
+msgstr "文本文件 (*.txt);;所有文件 (*.*)"
+
+msgid "Logs exported to: %1"
+msgstr "日志已导出到：%1"
+
+msgid "Export Failed"
+msgstr "导出失败"
+
+msgid "Failed to save logs to file."
+msgstr "无法将日志保存到文件。"
+
+msgid "WebSocket mode: Server will push state updates automatically."
+msgstr "WebSocket 模式：服务器将自动推送状态更新。"
+
+msgid "Stopped listening for state updates."
+msgstr "已停止监听状态更新。"
+
 #: YukariConnectOnlinePanel.cpp:361
 msgid "Starting YukariConnect server..."
 msgstr "正在启动 YukariConnect 服务器..."
