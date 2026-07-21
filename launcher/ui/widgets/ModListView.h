@@ -17,10 +17,15 @@
 #include <QHeaderView>
 #include <QTreeView>
 
+class QPainter;
+
 class ModListView : public QTreeView {
     Q_OBJECT
    public:
     explicit ModListView(QWidget* parent = 0);
     virtual void setModel(QAbstractItemModel* model);
     virtual void setResizeModes(const QList<QHeaderView::ResizeMode>& modes);
+
+   protected:
+    void drawRow(QPainter* painter, const QStyleOptionViewItem& options, const QModelIndex& index) const override;
 };

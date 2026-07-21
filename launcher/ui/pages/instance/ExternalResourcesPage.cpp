@@ -45,9 +45,13 @@
 #include <QHeaderView>
 #include <QKeyEvent>
 #include <QMenu>
+#include <QSet>
 #include <algorithm>
 
-ExternalResourcesPage::ExternalResourcesPage(BaseInstance* instance, ResourceFolderModel* model, QWidget* parent)
+ExternalResourcesPage::ExternalResourcesPage(BaseInstance* instance,
+                                             ResourceFolderModel* model,
+                                             QWidget* parent,
+                                             QAbstractProxyModel* viewProxy)
     : QMainWindow(parent), m_instance(instance), ui(new Ui::ExternalResourcesPage), m_model(model)
 {
     ui->setupUi(this);
@@ -60,7 +64,14 @@ ExternalResourcesPage::ExternalResourcesPage(BaseInstance* instance, ResourceFol
     m_filterModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     m_filterModel->setSourceModel(m_model);
     m_filterModel->setFilterKeyColumn(-1);
-    ui->treeView->setModel(m_filterModel);
+    if (viewProxy) {
+        viewProxy->setParent(this);
+        viewProxy->setSourceModel(m_filterModel);
+        m_viewModel = viewProxy;
+    } else {
+        m_viewModel = m_filterModel;
+    }
+    ui->treeView->setModel(m_viewModel);
     // must come after setModel
     ui->treeView->setResizeModes(m_model->columnResizeModes());
 
@@ -130,6 +141,14 @@ QMenu* ExternalResourcesPage::createPopupMenu()
 
 void ExternalResourcesPage::ShowContextMenu(const QPoint& pos)
 {
+    const auto index = ui->treeView->indexAt(pos);
+    if (index.isValid()) {
+        if (!ui->treeView->selectionModel()->isSelected(index)) {
+            ui->treeView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+        } else {
+            ui->treeView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::NoUpdate);
+        }
+    }
     auto menu = ui->actionsToolbar->createContextMenu(this, tr("Context menu"));
     menu->exec(ui->treeView->mapToGlobal(pos));
     delete menu;
@@ -166,8 +185,7 @@ void ExternalResourcesPage::retranslate()
 
 void ExternalResourcesPage::itemActivated(const QModelIndex&)
 {
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection());
-    m_model->setResourceEnabled(selection.indexes(), EnableAction::TOGGLE);
+    m_model->setResourceEnabled(selectedResourceRows(), EnableAction::TOGGLE);
 }
 
 void ExternalResourcesPage::filterTextChanged(const QString& newContents)
@@ -223,18 +241,19 @@ void ExternalResourcesPage::addItem()
 
 void ExternalResourcesPage::removeItem()
 {
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection());
+    const auto selection = selectedResourceRows();
+    if (selection.isEmpty()) {
+        return;
+    }
 
     int count = 0;
     bool folder = false;
-    for (auto& i : selection.indexes()) {
-        if (i.column() == 0) {
-            count++;
+    for (const auto& index : selection) {
+        count++;
 
-            // if a folder is selected, show the confirmation dialog
-            if (m_model->at(i.row()).fileinfo().isDir())
-                folder = true;
-        }
+        // if a folder is selected, show the confirmation dialog
+        if (m_model->at(index.row()).fileinfo().isDir())
+            folder = true;
     }
 
     QString text;
@@ -249,7 +268,7 @@ void ExternalResourcesPage::removeItem()
         text = tr("You are about to remove the folder \"%1\".\n"
                   "This may be permanent and it will be gone from the parent folder.\n\n"
                   "Are you sure?")
-                   .arg(m_model->at(selection.indexes().at(0).row()).fileinfo().fileName());
+                   .arg(m_model->at(selection.at(0).row()).fileinfo().fileName());
     }
 
     if (!text.isEmpty()) {
@@ -264,7 +283,7 @@ void ExternalResourcesPage::removeItem()
     removeItems(selection);
 }
 
-void ExternalResourcesPage::removeItems(const QItemSelection& selection)
+void ExternalResourcesPage::removeItems(const QModelIndexList& selection)
 {
     if (m_instance != nullptr && m_instance->isRunning()) {
         auto response = CustomMessageBox::selectable(this, tr("Confirm Delete"),
@@ -276,25 +295,22 @@ void ExternalResourcesPage::removeItems(const QItemSelection& selection)
         if (response != QMessageBox::Yes)
             return;
     }
-    m_model->deleteResources(selection.indexes());
+    m_model->deleteResources(selection);
 }
 
 void ExternalResourcesPage::enableItem()
 {
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection());
-    m_model->setResourceEnabled(selection.indexes(), EnableAction::ENABLE);
+    m_model->setResourceEnabled(selectedResourceRows(), EnableAction::ENABLE);
 }
 
 void ExternalResourcesPage::disableItem()
 {
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection());
-    m_model->setResourceEnabled(selection.indexes(), EnableAction::DISABLE);
+    m_model->setResourceEnabled(selectedResourceRows(), EnableAction::DISABLE);
 }
 
 void ExternalResourcesPage::viewHomepage()
 {
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
-    for (auto resource : m_model->selectedResources(selection)) {
+    for (auto resource : m_model->selectedResources(selectedResourceRows())) {
         auto url = resource->homepage();
         if (!url.isEmpty())
             DesktopServices::openUrl(url);
@@ -313,11 +329,12 @@ void ExternalResourcesPage::viewFolder()
 
 void ExternalResourcesPage::updateActions()
 {
-    const bool hasSelection = ui->treeView->selectionModel()->hasSelection();
-    const QModelIndexList selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
+    const QModelIndexList selection = selectedResourceRows();
     const QList<Resource*> selectedResources = m_model->selectedResources(selection);
+    const bool hasSelection = !selectedResources.isEmpty();
+    const bool canUseAll = !hasViewSelection();
 
-    ui->actionUpdateItem->setEnabled(!m_model->empty());
+    ui->actionUpdateItem->setEnabled(!m_model->empty() && (hasSelection || canUseAll));
     ui->actionResetItemMetadata->setEnabled(hasSelection);
 
     ui->actionChangeVersion->setEnabled(selectedResources.size() == 1 && selectedResources[0]->metadata() != nullptr);
@@ -328,13 +345,17 @@ void ExternalResourcesPage::updateActions()
 
     ui->actionViewHomepage->setEnabled(hasSelection && std::any_of(selectedResources.begin(), selectedResources.end(),
                                                                    [](Resource* resource) { return !resource->homepage().isEmpty(); }));
-    ui->actionExportMetadata->setEnabled(!m_model->empty());
+    ui->actionExportMetadata->setEnabled(!m_model->empty() && (hasSelection || canUseAll));
     ui->actionValidateMods->setEnabled(!m_model->empty());
 }
 
 void ExternalResourcesPage::updateFrame(const QModelIndex& current, [[maybe_unused]] const QModelIndex& previous)
 {
-    auto sourceCurrent = m_filterModel->mapToSource(current);
+    auto sourceCurrent = mapToResourceModel(current);
+    if (!sourceCurrent.isValid()) {
+        ui->frame->clear();
+        return;
+    }
     int row = sourceCurrent.row();
     Resource const& resource = m_model->at(row);
     ui->frame->updateWithResource(resource);
@@ -343,9 +364,45 @@ void ExternalResourcesPage::updateFrame(const QModelIndex& current, [[maybe_unus
 QString ExternalResourcesPage::extraHeaderInfoString()
 {
     if (ui && ui->treeView && ui->treeView->selectionModel()) {
-        auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
-        if (auto count = std::count_if(selection.cbegin(), selection.cend(), [](auto v) { return v.column() == 0; }); count != 0)
-            return tr(" (%1 installed, %2 selected)").arg(m_model->size()).arg(count);
+        const auto selection = selectedResourceRows();
+        if (!selection.isEmpty())
+            return tr(" (%1 installed, %2 selected)").arg(m_model->size()).arg(selection.size());
     }
     return tr(" (%1 installed)").arg(m_model->size());
+}
+
+QModelIndex ExternalResourcesPage::mapToResourceModel(const QModelIndex& index) const
+{
+    auto current = index;
+    while (current.isValid() && current.model() != m_model) {
+        const auto proxy = qobject_cast<const QAbstractProxyModel*>(current.model());
+        if (!proxy) {
+            return {};
+        }
+        current = proxy->mapToSource(current);
+    }
+    return current.model() == m_model ? current : QModelIndex{};
+}
+
+QModelIndexList ExternalResourcesPage::selectedResourceRows() const
+{
+    QModelIndexList result;
+    QSet<int> seenRows;
+    if (!ui || !ui->treeView || !ui->treeView->selectionModel()) {
+        return result;
+    }
+
+    for (const auto& selected : ui->treeView->selectionModel()->selectedRows(0)) {
+        auto source = mapToResourceModel(selected);
+        if (source.isValid() && !seenRows.contains(source.row())) {
+            seenRows.insert(source.row());
+            result.append(source.siblingAtColumn(0));
+        }
+    }
+    return result;
+}
+
+bool ExternalResourcesPage::hasViewSelection() const
+{
+    return ui && ui->treeView && ui->treeView->selectionModel() && ui->treeView->selectionModel()->hasSelection();
 }

@@ -34,6 +34,7 @@ class InstanceCopyTask : public InstanceTask {
     bool m_useLinks = false;
     bool m_useHardLinks = false;
     bool m_copySaves = false;
+    bool m_copyMods = true;
     bool m_linkRecursively = false;
     bool m_useClone = false;
 };

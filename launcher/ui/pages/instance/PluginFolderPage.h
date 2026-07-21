@@ -32,7 +32,7 @@ class PluginFolderPage : public ExternalResourcesPage {
     void updateFrame(const QModelIndex& current, const QModelIndex& previous) override;
 
    private slots:
-    void removeItems(const QItemSelection& selection) override;
+    void removeItems(const QModelIndexList& selection) override;
 
     void downloadPlugins();
     void downloadDialogFinished(int result);

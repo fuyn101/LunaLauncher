@@ -44,7 +44,9 @@
 
 #include <QAbstractItemModel>
 #include <QAction>
+#include <QDir>
 #include <QEvent>
+#include <QInputDialog>
 #include <QKeyEvent>
 #include <QMenu>
 #include <QMessageBox>
@@ -61,6 +63,7 @@
 #include "minecraft/PackProfile.h"
 #include "minecraft/VersionFilterData.h"
 #include "minecraft/mod/Mod.h"
+#include "minecraft/mod/ModCategoryProxyModel.h"
 #include "minecraft/mod/ModFolderModel.h"
 #include "minecraft/mod/tasks/ModPreflightTask.h"
 
@@ -71,9 +74,40 @@
 #include "ui/dialogs/ModPreflightDialog.h"
 #include "ui/dialogs/ProgressDialog.h"
 
-ModFolderPage::ModFolderPage(BaseInstance* inst, ModFolderModel* model, QWidget* parent)
-    : ExternalResourcesPage(inst, model, parent), m_model(model)
+namespace {
+ModCategoryProxyModel* createCategoryProxy(BaseInstance* instance, ModFolderModel* model)
 {
+    const auto root = instance ? instance->instanceRoot() : model->dir().absolutePath();
+    auto scope = QDir(root).relativeFilePath(model->dir().absolutePath());
+    scope.replace('\\', '/');
+    return new ModCategoryProxyModel(root, scope, model);
+}
+}  // namespace
+
+ModFolderPage::ModFolderPage(BaseInstance* inst, ModFolderModel* model, QWidget* parent)
+    : ExternalResourcesPage(inst, model, parent, createCategoryProxy(inst, model)), m_model(model)
+{
+    m_categoryModel = qobject_cast<ModCategoryProxyModel*>(m_viewModel);
+    Q_ASSERT(m_categoryModel);
+
+    ui->treeView->setDragDropMode(QAbstractItemView::DragDrop);
+    ui->treeView->setDefaultDropAction(Qt::MoveAction);
+    connect(ui->treeView, &ModListView::clicked, this, [this](const QModelIndex& index) {
+        if (m_categoryModel->isCategory(index)) {
+            m_categoryModel->toggleCategory(index);
+        }
+    });
+    connect(ui->filterEdit, &QLineEdit::textChanged, this,
+            [this](const QString& text) { m_categoryModel->setFilterActive(!text.isEmpty()); });
+
+    m_categoryAction = new QAction(QIcon::fromTheme("tag"), tr("Categories"), this);
+    m_categoryAction->setObjectName(QStringLiteral("actionModCategories"));
+    m_categoryAction->setToolTip(tr("Create categories and assign selected mods"));
+    m_categoryMenu = new QMenu(this);
+    m_categoryAction->setMenu(m_categoryMenu);
+    connect(m_categoryMenu, &QMenu::aboutToShow, this, &ModFolderPage::populateCategoryMenu);
+    ui->actionsToolbar->insertActionBefore(ui->actionRemoveItem, m_categoryAction);
+
     ui->actionDownloadItem->setText(tr("Download Mods"));
     ui->actionDownloadItem->setToolTip(tr("Download mods from online mod platforms"));
     ui->actionDownloadItem->setEnabled(true);
@@ -123,6 +157,134 @@ ModFolderPage::ModFolderPage(BaseInstance* inst, ModFolderModel* model, QWidget*
     ui->actionsToolbar->insertActionAfter(ui->actionViewFolder, ui->actionViewConfigs);
 }
 
+void ModFolderPage::populateCategoryMenu()
+{
+    m_categoryMenu->clear();
+    auto create = m_categoryMenu->addAction(tr("New Category..."));
+    connect(create, &QAction::triggered, this, &ModFolderPage::createCategory);
+
+    auto assignMenu = m_categoryMenu->addMenu(tr("Assign Selected Mods"));
+    const auto selectedMods = m_model->selectedMods(selectedResourceRows());
+    assignMenu->setEnabled(!selectedMods.isEmpty());
+
+    QString commonCategory;
+    bool first = true;
+    bool mixed = false;
+    for (const auto mod : selectedMods) {
+        const auto category = m_categoryModel->categoryFor(*mod);
+        if (first) {
+            commonCategory = category;
+            first = false;
+        } else if (commonCategory != category) {
+            mixed = true;
+        }
+    }
+
+    auto uncategorized = assignMenu->addAction(tr("No Category"));
+    uncategorized->setCheckable(true);
+    uncategorized->setChecked(!mixed && !selectedMods.isEmpty() && commonCategory.isEmpty());
+    connect(uncategorized, &QAction::triggered, this, [this] { assignSelectedToCategory({}); });
+
+    if (!m_categoryModel->categories().isEmpty()) {
+        assignMenu->addSeparator();
+    }
+    for (const auto& category : m_categoryModel->categories()) {
+        auto action = assignMenu->addAction(category.name);
+        action->setCheckable(true);
+        action->setChecked(!mixed && !selectedMods.isEmpty() && commonCategory == category.id);
+        connect(action, &QAction::triggered, this, [this, id = category.id] { assignSelectedToCategory(id); });
+    }
+
+    const auto current = ui->treeView->currentIndex();
+    const auto currentCategory = m_categoryModel->categoryId(current);
+    if (currentCategory.isEmpty()) {
+        return;
+    }
+
+    m_categoryMenu->addSeparator();
+    auto rename = m_categoryMenu->addAction(tr("Rename Category..."));
+    connect(rename, &QAction::triggered, this, &ModFolderPage::renameCurrentCategory);
+    auto remove = m_categoryMenu->addAction(tr("Delete Category"));
+    connect(remove, &QAction::triggered, this, &ModFolderPage::removeCurrentCategory);
+
+    const auto categories = m_categoryModel->categories();
+    int categoryIndex = -1;
+    for (int i = 0; i < categories.size(); ++i) {
+        if (categories.at(i).id == currentCategory) {
+            categoryIndex = i;
+            break;
+        }
+    }
+    auto moveUp = m_categoryMenu->addAction(tr("Move Category Up"));
+    moveUp->setEnabled(categoryIndex > 0);
+    connect(moveUp, &QAction::triggered, this, [this] { moveCurrentCategory(-1); });
+    auto moveDown = m_categoryMenu->addAction(tr("Move Category Down"));
+    moveDown->setEnabled(categoryIndex >= 0 && categoryIndex + 1 < categories.size());
+    connect(moveDown, &QAction::triggered, this, [this] { moveCurrentCategory(1); });
+}
+
+void ModFolderPage::createCategory()
+{
+    bool accepted = false;
+    const auto name = QInputDialog::getText(this, tr("New Category"), tr("Category name:"), QLineEdit::Normal, {}, &accepted).trimmed();
+    if (!accepted || name.isEmpty()) {
+        return;
+    }
+    const auto selectedMods = m_model->selectedMods(selectedResourceRows());
+    const auto id = m_categoryModel->addCategory(name);
+    if (id.isEmpty()) {
+        const auto error = m_categoryModel->lastError();
+        QMessageBox::warning(this, tr("Categories"), error.isEmpty() ? tr("A category with that name already exists.") : error);
+        return;
+    }
+    m_categoryModel->assignMods(selectedMods, id);
+}
+
+void ModFolderPage::renameCurrentCategory()
+{
+    const auto currentCategory = m_categoryModel->categoryId(ui->treeView->currentIndex());
+    if (currentCategory.isEmpty()) {
+        return;
+    }
+    bool accepted = false;
+    const auto currentName = ui->treeView->currentIndex().data(ModCategoryProxyModel::CategoryNameRole).toString();
+    const auto name = QInputDialog::getText(this, tr("Rename Category"), tr("Category name:"), QLineEdit::Normal, currentName, &accepted)
+                          .trimmed();
+    if (accepted && !name.isEmpty() && !m_categoryModel->renameCategory(currentCategory, name)) {
+        const auto error = m_categoryModel->lastError();
+        QMessageBox::warning(this, tr("Categories"), error.isEmpty() ? tr("A category with that name already exists.") : error);
+    }
+}
+
+void ModFolderPage::removeCurrentCategory()
+{
+    const auto current = ui->treeView->currentIndex();
+    const auto currentCategory = m_categoryModel->categoryId(current);
+    if (currentCategory.isEmpty()) {
+        return;
+    }
+    const auto name = current.data(ModCategoryProxyModel::CategoryNameRole).toString();
+    const auto response = QMessageBox::question(this, tr("Delete Category"),
+                                                tr("Delete the category '%1'? Its mods will become uncategorized.").arg(name),
+                                                QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (response == QMessageBox::Yes) {
+        m_categoryModel->removeCategory(currentCategory);
+    }
+}
+
+void ModFolderPage::moveCurrentCategory(int offset)
+{
+    const auto currentCategory = m_categoryModel->categoryId(ui->treeView->currentIndex());
+    if (!currentCategory.isEmpty()) {
+        m_categoryModel->moveCategory(currentCategory, offset);
+    }
+}
+
+void ModFolderPage::assignSelectedToCategory(const QString& categoryId)
+{
+    m_categoryModel->assignMods(m_model->selectedMods(selectedResourceRows()), categoryId);
+}
+
 bool ModFolderPage::shouldDisplay() const
 {
     return true;
@@ -130,13 +292,17 @@ bool ModFolderPage::shouldDisplay() const
 
 void ModFolderPage::updateFrame(const QModelIndex& current, [[maybe_unused]] const QModelIndex& previous)
 {
-    auto sourceCurrent = m_filterModel->mapToSource(current);
+    auto sourceCurrent = mapToResourceModel(current);
+    if (!sourceCurrent.isValid()) {
+        ui->frame->clear();
+        return;
+    }
     int row = sourceCurrent.row();
     const Mod& mod = m_model->at(row);
     ui->frame->updateWithMod(mod);
 }
 
-void ModFolderPage::removeItems(const QItemSelection& selection)
+void ModFolderPage::removeItems(const QModelIndexList& selection)
 {
     if (m_instance != nullptr && m_instance->isRunning()) {
         auto response = CustomMessageBox::selectable(this, tr("Confirm Delete"),
@@ -149,8 +315,7 @@ void ModFolderPage::removeItems(const QItemSelection& selection)
             return;
     }
 
-    auto indexes = selection.indexes();
-    auto affected = m_model->getAffectedMods(indexes, EnableAction::DISABLE);
+    auto affected = m_model->getAffectedMods(selection, EnableAction::DISABLE);
     if (!affected.isEmpty()) {
         auto response = CustomMessageBox::selectable(this, tr("Confirm Disable"),
                                                      tr("The mods you are trying to delete are required by %1 mods.\n"
@@ -167,7 +332,7 @@ void ModFolderPage::removeItems(const QItemSelection& selection)
             m_model->setResourceEnabled(affected, EnableAction::DISABLE);
         }
     }
-    m_model->deleteResources(indexes);
+    m_model->deleteResources(selection);
 }
 
 void ModFolderPage::downloadMods()
@@ -282,7 +447,10 @@ void ModFolderPage::updateMods(bool includeDeps)
         if (response != QMessageBox::Yes)
             return;
     }
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
+    auto selection = selectedResourceRows();
+    if (selection.isEmpty() && hasViewSelection()) {
+        return;
+    }
 
     auto mods_list = m_model->selectedResources(selection);
     bool use_all = mods_list.empty();
@@ -371,7 +539,7 @@ void ModFolderPage::validateMods()
 
 void ModFolderPage::deleteModMetadata()
 {
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
+    auto selection = selectedResourceRows();
     auto selectionCount = m_model->selectedMods(selection).length();
     if (selectionCount == 0)
         return;
@@ -405,7 +573,7 @@ void ModFolderPage::changeModVersion()
         QMessageBox::critical(this, tr("Error"), tr("Mod updates are unavailable when metadata is disabled!"));
         return;
     }
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
+    auto selection = selectedResourceRows();
     auto mods_list = m_model->selectedMods(selection);
     if (mods_list.length() != 1 || mods_list[0]->metadata() == nullptr)
         return;
@@ -420,7 +588,10 @@ void ModFolderPage::changeModVersion()
 
 void ModFolderPage::exportModMetadata()
 {
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
+    auto selection = selectedResourceRows();
+    if (selection.isEmpty() && hasViewSelection()) {
+        return;
+    }
     auto selectedMods = m_model->selectedMods(selection);
     if (selectedMods.length() == 0)
         selectedMods = m_model->allMods();

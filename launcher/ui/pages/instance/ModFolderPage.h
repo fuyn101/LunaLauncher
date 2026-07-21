@@ -42,6 +42,10 @@
 #include "ExternalResourcesPage.h"
 #include "ui/dialogs/ResourceDownloadDialog.h"
 
+class QAction;
+class QMenu;
+class ModCategoryProxyModel;
+
 class ModFolderPage : public ExternalResourcesPage {
     Q_OBJECT
 
@@ -64,7 +68,7 @@ class ModFolderPage : public ExternalResourcesPage {
     void updateFrame(const QModelIndex& current, const QModelIndex& previous) override;
 
    private slots:
-    void removeItems(const QItemSelection& selection) override;
+    void removeItems(const QModelIndexList& selection) override;
 
     void downloadMods();
     void downloadDialogFinished(int result);
@@ -73,9 +77,18 @@ class ModFolderPage : public ExternalResourcesPage {
     void exportModMetadata();
     void changeModVersion();
     void validateMods();
+    void populateCategoryMenu();
+    void createCategory();
+    void renameCurrentCategory();
+    void removeCurrentCategory();
+    void moveCurrentCategory(int offset);
+    void assignSelectedToCategory(const QString& categoryId);
 
    protected:
     ModFolderModel* m_model;
+    ModCategoryProxyModel* m_categoryModel = nullptr;
+    QAction* m_categoryAction = nullptr;
+    QMenu* m_categoryMenu = nullptr;
     QPointer<ResourceDownload::ModDownloadDialog> m_downloadDialog;
 };
 
