@@ -144,21 +144,7 @@ class FlameAPI : public ResourceAPI {
 
     QJsonArray documentToArray(QJsonDocument& obj) const override { return obj.object()["data"].toArray(); }
     void loadIndexedPack(ModPlatform::IndexedPack& m, QJsonObject& obj) const override { FlameMod::loadIndexedPack(m, obj); }
-    ModPlatform::IndexedVersion loadIndexedPackVersion(QJsonObject& obj, ModPlatform::ResourceType resourceType) const override
-    {
-        auto arr = FlameMod::loadIndexedPackVersion(obj);
-        if (resourceType != ModPlatform::ResourceType::TexturePack) {
-            return arr;
-        }
-        // FIXME: Client-side version filtering. This won't take into account any user-selected filtering.
-        const auto& mc_versions = arr.mcVersion;
-
-        if (std::any_of(mc_versions.constBegin(), mc_versions.constEnd(),
-                        [](const auto& mc_version) { return Version(mc_version) <= Version("1.6"); })) {
-            return arr;
-        }
-        return {};
-    };
+    ModPlatform::IndexedVersion loadIndexedPackVersion(QJsonObject& obj, ModPlatform::ResourceType resourceType) const override;
     void loadExtraPackInfo(ModPlatform::IndexedPack& m, [[maybe_unused]] QJsonObject&) const override { FlameMod::loadBody(m); }
 
    private:

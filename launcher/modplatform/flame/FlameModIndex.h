@@ -15,4 +15,5 @@ void loadURLs(ModPlatform::IndexedPack& m, QJsonObject& obj);
 void loadBody(ModPlatform::IndexedPack& m);
 void loadIndexedPackVersions(ModPlatform::IndexedPack& pack, QJsonArray& arr);
 ModPlatform::IndexedVersion loadIndexedPackVersion(QJsonObject& obj, bool load_changelog = false);
+void resolveDownloadUrl(ModPlatform::IndexedVersion& version, const QJsonObject& obj);
 }  // namespace FlameMod
