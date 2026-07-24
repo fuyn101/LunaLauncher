@@ -134,6 +134,7 @@ void Flame::FileResolvingTask::netJobFinished(QByteArray* response)
         try {
             auto obj = Json::requireObject(file);
             auto version = FlameMod::loadIndexedPackVersion(obj);
+            FlameMod::resolveDownloadUrl(version, obj);
             auto fileid = version.fileId.toInt();
             Q_ASSERT(fileid != 0);
             Q_ASSERT(m_manifest.files.contains(fileid));

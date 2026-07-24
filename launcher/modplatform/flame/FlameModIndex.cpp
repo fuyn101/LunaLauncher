@@ -1,5 +1,7 @@
 ﻿#include "FlameModIndex.h"
 
+#include <QUrl>
+
 #include "FileSystem.h"
 #include "Json.h"
 #include "minecraft/MinecraftInstance.h"
@@ -207,4 +209,29 @@ auto FlameMod::loadIndexedPackVersion(QJsonObject& obj, bool load_changelog) -> 
         file.changelog = api.getModFileChangelog(file.addonId.toInt(), file.fileId.toInt());
 
     return file;
+}
+
+void FlameMod::resolveDownloadUrl(ModPlatform::IndexedVersion& version, const QJsonObject& obj)
+{
+    if (!version.downloadUrl.isEmpty()) {
+        return;
+    }
+
+    const auto fileId = Json::requireInteger(obj, "id");
+    const auto fileName = Json::requireString(obj, "fileName");
+    if (fileId <= 0 || fileName.isEmpty()) {
+        return;
+    }
+
+    QByteArray encodedUrl = "https://edge.forgecdn.net/files/";
+    encodedUrl += QByteArray::number(fileId / 1000);
+    encodedUrl += '/';
+    encodedUrl += QByteArray::number(fileId % 1000);
+    encodedUrl += '/';
+    encodedUrl += QUrl::toPercentEncoding(fileName);
+
+    const auto fallbackUrl = QUrl::fromEncoded(encodedUrl, QUrl::StrictMode);
+    if (fallbackUrl.isValid()) {
+        version.downloadUrl = fallbackUrl.toString(QUrl::FullyEncoded);
+    }
 }

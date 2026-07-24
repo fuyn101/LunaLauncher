@@ -15,6 +15,24 @@
 #include "net/ApiUpload.h"
 #include "net/NetJob.h"
 
+ModPlatform::IndexedVersion FlameAPI::loadIndexedPackVersion(QJsonObject& obj, ModPlatform::ResourceType resourceType) const
+{
+    auto version = FlameMod::loadIndexedPackVersion(obj);
+    FlameMod::resolveDownloadUrl(version, obj);
+
+    if (resourceType != ModPlatform::ResourceType::TexturePack) {
+        return version;
+    }
+
+    // FIXME: Client-side version filtering. This won't take into account any user-selected filtering.
+    const auto& mc_versions = version.mcVersion;
+    if (std::any_of(mc_versions.constBegin(), mc_versions.constEnd(),
+                    [](const auto& mc_version) { return Version(mc_version) <= Version("1.6"); })) {
+        return version;
+    }
+    return {};
+}
+
 std::pair<Task::Ptr, QByteArray*> FlameAPI::matchFingerprints(const QList<uint>& fingerprints)
 {
     auto netJob = makeShared<NetJob>(QString("Flame::MatchFingerprints"), APPLICATION->network());

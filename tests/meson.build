@@ -19,6 +19,7 @@ test_sources = [
   'INIFile_test.cpp',
   'JavaVersion_test.cpp',
   'Packwiz_test.cpp',
+  'FlameAPI_test.cpp',
   'Index_test.cpp',
   'Version_test.cpp',
   'MetaComponentParse_test.cpp',
