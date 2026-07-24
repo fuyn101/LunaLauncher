@@ -8,6 +8,7 @@ test_sources = [
   'BMCLAPICompareTest.cpp',
   'ResourceFolderModel_test.cpp',
   'ModCategory_test.cpp',
+  'Translations_test.cpp',
   'ResourcePackParse_test.cpp',
   'TexturePackParse_test.cpp',
   'DataPackParse_test.cpp',

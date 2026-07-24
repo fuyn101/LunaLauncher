@@ -332,15 +332,16 @@ void TranslationsModel::reloadLocalFiles()
 
         QString langCode;
         FileType fileType = FileType::NONE;
+        const auto baseName = QFileInfo(fileName).completeBaseName();
         if (completeSuffix == "qm") {
-            if (fileName.startsWith("mmc_")) {
-                langCode = fileName.mid(4);  // Remove "mmc_" prefix
+            if (baseName.startsWith("mmc_")) {
+                langCode = baseName.mid(4);  // Remove "mmc_" prefix
             } else {
                 return qMakePair(QString(), qMakePair(FileType::NONE, false));  // Invalid .qm file name
             }
             fileType = FileType::QM;
         } else if (completeSuffix == "po") {
-            langCode = fileName;  // .po files use the whole filename as langCode
+            langCode = baseName;
             fileType = FileType::PO;
         } else {
             return qMakePair(QString(), qMakePair(FileType::NONE, false));
@@ -573,6 +574,10 @@ bool TranslationsModel::selectLanguage(QString key)
         QCoreApplication::removeTranslator(d->m_app_translator.get());
         d->m_app_translator.reset();
     }
+    if (d->m_po_translator) {
+        QCoreApplication::removeTranslator(d->m_po_translator.get());
+        d->m_po_translator.reset();
+    }
     if (d->m_qt_translator) {
         QCoreApplication::removeTranslator(d->m_qt_translator.get());
         d->m_qt_translator.reset();
@@ -608,15 +613,30 @@ bool TranslationsModel::selectLanguage(QString key)
         d->m_qt_translator.reset();
     }
 
-    // Check if we have PO and/or QM files
-    bool hasPO = QFile::exists(FS::PathCombine(d->m_dir.path(), langCode + ".po"));
-    bool hasQM = QFile::exists(FS::PathCombine(d->m_dir.path(), "mmc_" + langCode + ".qm"));
+    auto findTranslationFile = [this](const QStringList& names) {
+        for (const auto& name : names) {
+            const auto userPath = d->m_dir.absoluteFilePath(name);
+            if (QFile::exists(userPath)) {
+                return userPath;
+            }
+            const auto installPath = d->m_install_dir.absoluteFilePath(name);
+            if (QFile::exists(installPath)) {
+                return installPath;
+            }
+        }
+        return QString{};
+    };
+
+    const auto qmPath = findTranslationFile({ "mmc_" + langCode + ".qm" });
+    const auto poPath = findTranslationFile({ "!" + langCode + ".po", langCode + ".po" });
+    const bool hasQM = !qmPath.isEmpty();
+    const bool hasPO = !poPath.isEmpty();
 
     // Load QM first as fallback (lower priority)
     if (hasQM) {
         d->m_app_translator.reset(new QTranslator());
-        if (d->m_app_translator->load("mmc_" + langCode, d->m_dir.path())) {
-            qDebug() << "Loading Application Language File (QM) for" << langCode.toLocal8Bit().constData() << "...";
+        if (d->m_app_translator->load(qmPath)) {
+            qDebug() << "Loading Application Language File (QM) for" << langCode.toLocal8Bit().constData() << "from" << qmPath;
             if (!QCoreApplication::installTranslator(d->m_app_translator.get())) {
                 qCritical() << "Installing Application Language File (QM) failed.";
                 d->m_app_translator.reset();
@@ -630,8 +650,8 @@ bool TranslationsModel::selectLanguage(QString key)
 
     // Load PO as override (higher priority - installed last takes precedence)
     if (hasPO) {
-        qDebug() << "Loading Application Language File (PO) for" << langCode.toLocal8Bit().constData() << "...";
-        auto poTranslator = new POTranslator(FS::PathCombine(d->m_dir.path(), langCode + ".po"));
+        qDebug() << "Loading Application Language File (PO) for" << langCode.toLocal8Bit().constData() << "from" << poPath;
+        auto poTranslator = new POTranslator(poPath);
         if (!poTranslator->isEmpty()) {
             if (!QCoreApplication::installTranslator(poTranslator)) {
                 delete poTranslator;

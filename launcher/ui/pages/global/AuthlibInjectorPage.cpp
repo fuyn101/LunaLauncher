@@ -61,6 +61,9 @@ bool AuthlibInjectorPage::apply()
 void AuthlibInjectorPage::retranslate()
 {
     ui->retranslateUi(this);
+    ui->comboBox_download_source->setItemText(0, tr("BMCLAPI (Recommended for China)"));
+    ui->comboBox_download_source->setItemText(1, tr("Official (authlib-injector.yushi.moe)"));
+    updateStatus();
 }
 
 void AuthlibInjectorPage::refreshStatus()
