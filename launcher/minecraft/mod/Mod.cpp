@@ -69,6 +69,7 @@ int Mod::compare(const Resource& other, SortType type) const
         default:
         case SortType::ENABLED:
         case SortType::NAME:
+        case SortType::FILE_NAME:
         case SortType::DATE:
         case SortType::SIZE:
             return Resource::compare(other, type);

@@ -216,7 +216,8 @@ class ModCategoryTest : public QObject {
 
         QCOMPARE(model.index(0, ModFolderModel::NameColumn).data(Qt::DisplayRole).toString(), QStringLiteral("alpha"));
         QCOMPARE(filter->index(0, ModFolderModel::NameColumn).data(Qt::DisplayRole).toString(), QStringLiteral("alpha"));
-        QCOMPARE(categories.index(0, ModFolderModel::NameColumn).data(Qt::DisplayRole).toString(), QStringLiteral("alpha (alpha.jar)"));
+        QCOMPARE(categories.index(0, ModFolderModel::NameColumn).data(Qt::DisplayRole).toString(), QStringLiteral("alpha"));
+        QCOMPARE(categories.index(0, ModFolderModel::FileNameColumn).data(Qt::DisplayRole).toString(), QStringLiteral("alpha.jar"));
 
         const auto category = categories.addCategory("Gameplay");
         QVERIFY(!category.isEmpty());
@@ -254,7 +255,7 @@ class ModCategoryTest : public QObject {
         }
     }
 
-    void displayNameIncludesDisabledFileSuffix()
+    void fileNameIncludesDisabledSuffix()
     {
         QTemporaryDir instance;
         QVERIFY(instance.isValid());
@@ -276,8 +277,9 @@ class ModCategoryTest : public QObject {
         ModCategoryProxyModel categories(instance.path(), "minecraft/mods", &model);
         categories.setSourceModel(filter);
 
-        QCOMPARE(categories.index(0, ModFolderModel::NameColumn).data(Qt::DisplayRole).toString(),
-                 QStringLiteral("Example Mod (example.jar.disabled)"));
+        QCOMPARE(categories.index(0, ModFolderModel::NameColumn).data(Qt::DisplayRole).toString(), QStringLiteral("Example Mod"));
+        QCOMPARE(categories.index(0, ModFolderModel::FileNameColumn).data(Qt::DisplayRole).toString(),
+                 QStringLiteral("example.jar.disabled"));
     }
 };
 

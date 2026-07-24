@@ -167,6 +167,8 @@ int Resource::compare(const Resource& other, SortType type) const
 
             return QString::compare(this_name, other_name, Qt::CaseInsensitive);
         }
+        case SortType::FILE_NAME:
+            return QString::compare(fileinfo().fileName(), other.fileinfo().fileName(), Qt::CaseInsensitive);
         case SortType::DATE:
             if (dateTimeChanged() > other.dateTimeChanged())
                 return 1;

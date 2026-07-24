@@ -2173,6 +2173,14 @@ msgctxt "ModCategoryProxyModel"
 msgid "Failed to save parsed mod identities to the category file."
 msgstr "无法将解析后的 Mod 标识保存到分类文件。"
 
+msgctxt "ModFolderModel"
+msgid "File Name"
+msgstr "文件名"
+
+msgctxt "ModFolderModel"
+msgid "The file name of the mod."
+msgstr "Mod 的文件名。"
+
 # ========================================================================
 # Additional Luna pages and runtime messages
 # ========================================================================

@@ -63,6 +63,7 @@ class ModFolderModel : public ResourceFolderModel {
         ActiveColumn = 0,
         ImageColumn,
         NameColumn,
+        FileNameColumn,
         VersionColumn,
         DateColumn,
         ProviderColumn,
