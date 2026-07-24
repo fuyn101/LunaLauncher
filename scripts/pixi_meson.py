@@ -197,6 +197,7 @@ def configure(root: Path, profile: str) -> None:
         "-Dlibarchive:zstd=enabled",
         "-Dlibarchive:lzma=enabled",
         "-Dlibarchive:iconv=disabled",
+        "-Dzstd:bin_programs=false",
         "--wrap-mode=forcefallback",
     ]
     if system == "windows":
