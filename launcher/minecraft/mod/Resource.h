@@ -66,6 +66,7 @@ QDebug operator<<(QDebug debug, ResourceStatus status);
 
 enum class SortType {
     NAME,
+    FILE_NAME,
     DATE,
     VERSION,
     ENABLED,

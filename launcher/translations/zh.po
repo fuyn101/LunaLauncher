@@ -1714,3 +1714,11 @@ msgstr "HMCL 兼容（模拟 HMCL）"
 #: TerracottaOnlinePanel.cpp
 msgid "Terracotta is not running."
 msgstr "Terracotta 未运行。"
+
+msgctxt "ModFolderModel"
+msgid "File Name"
+msgstr "文件名"
+
+msgctxt "ModFolderModel"
+msgid "The file name of the mod."
+msgstr "Mod 的文件名。"

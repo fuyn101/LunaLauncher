@@ -522,6 +522,14 @@ msgstr "YukariConnect 服务器关闭超时，假定已停止。"
 msgid "Stopped"
 msgstr "已停止"
 
+msgctxt "ModFolderModel"
+msgid "File Name"
+msgstr "文件名"
+
+msgctxt "ModFolderModel"
+msgid "The file name of the mod."
+msgstr "Mod 的文件名。"
+
 #: YukariConnectOnlinePanel.cpp:361
 msgid "Starting YukariConnect server..."
 msgstr "正在启动 YukariConnect 服务器..."
