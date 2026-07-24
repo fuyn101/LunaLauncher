@@ -54,6 +54,15 @@ msgstr "专用"
             QCOMPARE(translator.translate("YukariConnectOnlinePanel", "Failed to connect to YukariConnect server.", nullptr, -1),
                      QString::fromUtf8("连接 YukariConnect 服务器失败。"));
             QCOMPARE(translator.translate("ModFolderPage", "Categories", nullptr, -1), QString::fromUtf8("分类"));
+            QCOMPARE(translator.translate("LauncherPage", "Use New UI Layout (Requires Restart)", nullptr, -1),
+                     QString::fromUtf8("使用新版界面布局（需要重启）"));
+            QCOMPARE(translator.translate("LauncherPage", "Show Server Preview in toolbar", nullptr, -1),
+                     QString::fromUtf8("在工具栏中显示服务器预览"));
+            QCOMPARE(translator.translate("APIPage", "Download &Mirrors", nullptr, -1), QString::fromUtf8("下载镜像(&M)"));
+            QCOMPARE(translator.translate("APIPage", "Official", nullptr, -1), QString::fromUtf8("官方"));
+            QCOMPARE(translator.translate("APIPage", "Libraries Server", nullptr, -1), QString::fromUtf8("库服务器"));
+            QCOMPARE(translator.translate("APIPage", "Mojang Downloads Mirror", nullptr, -1),
+                     QString::fromUtf8("Mojang 下载镜像"));
         }
     }
 

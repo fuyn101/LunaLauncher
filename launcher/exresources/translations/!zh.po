@@ -522,6 +522,130 @@ msgstr "YukariConnect 服务器关闭超时，假定已停止。"
 msgid "Stopped"
 msgstr "已停止"
 
+# ========================================================================
+# LauncherPage.ui additions
+# ========================================================================
+
+msgctxt "LauncherPage"
+msgid "Enable the new experimental 3-column UI layout."
+msgstr "启用新的实验性三栏界面布局。"
+
+msgctxt "LauncherPage"
+msgid "Use New UI Layout (Requires Restart)"
+msgstr "使用新版界面布局（需要重启）"
+
+msgctxt "LauncherPage"
+msgid "Show News Bar"
+msgstr "显示新闻栏"
+
+msgctxt "LauncherPage"
+msgid "Show Status Bar"
+msgstr "显示状态栏"
+
+msgctxt "LauncherPage"
+msgid "Multiplayer Features"
+msgstr "联机功能"
+
+msgctxt "LauncherPage"
+msgid "Show Server Preview in toolbar"
+msgstr "在工具栏中显示服务器预览"
+
+msgctxt "LauncherPage"
+msgid "Auto-adjust Server Preview width to fit names"
+msgstr "自动调整服务器预览宽度以适应名称"
+
+msgctxt "LauncherPage"
+msgid "Show Terracotta button in toolbar"
+msgstr "在工具栏中显示 Terracotta 按钮"
+
+msgctxt "LauncherPage"
+msgid "Show YukariConnect button in toolbar"
+msgstr "在工具栏中显示 YukariConnect 按钮"
+
+msgctxt "LauncherPage"
+msgid "Show Terracotta status in status bar"
+msgstr "在状态栏中显示 Terracotta 状态"
+
+msgctxt "LauncherPage"
+msgid "Show YukariConnect status in status bar"
+msgstr "在状态栏中显示 YukariConnect 状态"
+
+# ========================================================================
+# APIPage mirror settings
+# ========================================================================
+
+msgctxt "APIPage"
+msgid "Download &Mirrors"
+msgstr "下载镜像(&M)"
+
+msgctxt "APIPage"
+msgid "Mirror &Source"
+msgstr "镜像源(&S)"
+
+msgctxt "APIPage"
+msgid "Select a download mirror source. Custom mode allows individual URL configuration below."
+msgstr "选择下载镜像源。自定义模式允许单独配置下方各项 URL。"
+
+msgctxt "APIPage"
+msgid "Official"
+msgstr "官方"
+
+msgctxt "APIPage"
+msgid "BMCLAPI"
+msgstr "BMCLAPI"
+
+msgctxt "APIPage"
+msgid "Custom"
+msgstr "自定义"
+
+msgctxt "APIPage"
+msgid "Meta&data Server"
+msgstr "元数据服务器(&D)"
+
+msgctxt "APIPage"
+msgid "You can set this to a third-party metadata server to use patched libraries or other hacks."
+msgstr "可将此项设为第三方元数据服务器，以使用修改过的库或其他资源。"
+
+msgctxt "APIPage"
+msgid "Assets Server"
+msgstr "资源服务器"
+
+msgctxt "APIPage"
+msgid "You can set this to another server if you have problems with downloading assets."
+msgstr "如果下载资源时遇到问题，可以将此项设为其他服务器。"
+
+msgctxt "APIPage"
+msgid "Libraries Server"
+msgstr "库服务器"
+
+msgctxt "APIPage"
+msgid "You can set this to another server if you have problems with downloading libraries."
+msgstr "如果下载库时遇到问题，可以将此项设为其他服务器。"
+
+msgctxt "APIPage"
+msgid "FML Libraries Server"
+msgstr "FML 库服务器"
+
+msgctxt "APIPage"
+msgid "You can set this to another server if you have problems with downloading FML libraries (legacy Forge only)."
+msgstr "如果下载 FML 库时遇到问题，可以将此项设为其他服务器（仅适用于旧版 Forge）。"
+
+msgctxt "APIPage"
+msgid "Mojang Downloads Mirror"
+msgstr "Mojang 下载镜像"
+
+msgctxt "APIPage"
+msgid "For custom mirrors: URL to replace Mojang's download URLs in version JSON (e.g., client JAR, asset index). This replaces launcher.mojang.com and piston-data.mojang.com URLs."
+msgstr "用于自定义镜像：替换版本 JSON 中 Mojang 下载地址的 URL（例如客户端 JAR 和资源索引）。此项会替换 launcher.mojang.com 和 piston-data.mojang.com 的地址。"
+
+msgctxt "APIPage"
+msgid "Use Default"
+msgstr "使用默认值"
+
+msgctxt "APIPage"
+msgid "BMCLAPI (auto)"
+msgstr "BMCLAPI（自动）"
+
 #: TerracottaPage.ui
 msgid "Startup Mode:"
 msgstr "启动模式："
