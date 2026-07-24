@@ -19,6 +19,10 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QRect>
+#include <QStyle>
+#include <QStyleOption>
+
+#include "minecraft/mod/ModCategoryProxyModel.h"
 
 ModListView::ModListView(QWidget* parent) : QTreeView(parent)
 {
@@ -67,4 +71,58 @@ void ModListView::setResizeModes(const QList<QHeaderView::ResizeMode>& modes)
     for (int i = 0; i < count; i++) {
         head->setSectionResizeMode(i, modes[i]);
     }
+}
+
+void ModListView::drawRow(QPainter* painter, const QStyleOptionViewItem& options, const QModelIndex& index) const
+{
+    if (!index.data(ModCategoryProxyModel::CategoryHeaderRole).toBool()) {
+        QTreeView::drawRow(painter, options, index);
+        return;
+    }
+
+    painter->save();
+    QRect rowRect = options.rect;
+    rowRect.setLeft(0);
+    rowRect.setRight(viewport()->width());
+
+    QColor background = options.palette.alternateBase().color();
+    if (options.state & QStyle::State_Selected) {
+        background = options.palette.highlight().color();
+    } else {
+        const auto accent = options.palette.highlight().color();
+        background = QColor::fromRgbF(accent.redF(), accent.greenF(), accent.blueF(), 0.22f);
+    }
+    painter->fillRect(rowRect, background);
+
+    QFont font = options.font;
+    font.setBold(true);
+    painter->setFont(font);
+    painter->setPen((options.state & QStyle::State_Selected) ? options.palette.highlightedText().color()
+                                                            : options.palette.text().color());
+
+    const int margin = 8;
+    const int arrowSize = qMin(14, rowRect.height() - 6);
+    QStyleOption arrowOption;
+    arrowOption.rect = QRect(rowRect.left() + margin, rowRect.center().y() - arrowSize / 2, arrowSize, arrowSize);
+    arrowOption.palette = options.palette;
+    arrowOption.state = QStyle::State_Enabled;
+    style()->drawPrimitive(index.data(ModCategoryProxyModel::CategoryCollapsedRole).toBool() ? QStyle::PE_IndicatorArrowRight
+                                                                                             : QStyle::PE_IndicatorArrowDown,
+                           &arrowOption, painter, this);
+
+    const auto name = index.data(ModCategoryProxyModel::CategoryNameRole).toString();
+    const auto count = index.data(ModCategoryProxyModel::CategoryCountRole).toInt();
+    const auto text = tr("%1 (%2)").arg(name).arg(count);
+    QRect textRect = rowRect.adjusted(margin * 2 + arrowSize, 0, -margin, 0);
+    painter->drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, text);
+
+    const int textWidth = QFontMetrics(font).horizontalAdvance(text);
+    const int lineStart = textRect.left() + textWidth + margin;
+    if (lineStart < rowRect.right() - margin) {
+        auto lineColor = painter->pen().color();
+        lineColor.setAlphaF(0.25);
+        painter->setPen(lineColor);
+        painter->drawLine(lineStart, rowRect.center().y(), rowRect.right() - margin, rowRect.center().y());
+    }
+    painter->restore();
 }
