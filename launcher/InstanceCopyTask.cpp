@@ -1,5 +1,7 @@
 #include "InstanceCopyTask.h"
 #include <QDebug>
+#include <QFile>
+#include <QFileInfo>
 #include <QtConcurrentRun>
 #include <memory>
 #include "FileSystem.h"
@@ -16,13 +18,19 @@ InstanceCopyTask::InstanceCopyTask(BaseInstance* origInstance, const InstanceCop
     m_linkRecursively = prefs.isLinkRecursivelyEnabled();
     m_useHardLinks = prefs.isLinkRecursivelyEnabled() && prefs.isUseHardLinksEnabled();
     m_copySaves = prefs.isLinkRecursivelyEnabled() && prefs.isDontLinkSavesEnabled() && prefs.isCopySavesEnabled();
+    m_copyMods = prefs.isCopyModsEnabled();
     m_useClone = prefs.isUseCloneEnabled();
 
     QString filters = prefs.getSelectedFiltersAsRegex();
-    if (m_useLinks || m_useHardLinks) {
+    if (!m_useClone && (m_useLinks || m_useHardLinks)) {
         if (!filters.isEmpty())
             filters += "|";
         filters += "instance.cfg";
+        filters += "|(^|/)[.]lunalauncher(?:/|$)";
+    } else if (!m_copyMods) {
+        if (!filters.isEmpty())
+            filters += "|";
+        filters += "(^|/)[.]lunalauncher/mod-categories[.]json$";
     }
 
     qDebug() << "CopyFilters:" << filters;
@@ -40,6 +48,23 @@ void InstanceCopyTask::executeTask()
     setStatus(tr("Copying instance %1").arg(m_origInstance->name()));
 
     m_copyFuture = QtConcurrent::run(QThreadPool::globalInstance(), [this] {
+        auto copyModCategories = [this] {
+            if (!m_copyMods) {
+                return true;
+            }
+            const auto relativePath = QStringLiteral(".lunalauncher/mod-categories.json");
+            const auto source = FS::PathCombine(m_origInstance->instanceRoot(), relativePath);
+            if (!QFileInfo::exists(source)) {
+                return true;
+            }
+            const auto destination = FS::PathCombine(m_stagingPath, relativePath);
+            if (!FS::ensureFilePathExists(destination)) {
+                return false;
+            }
+            QFile::remove(destination);
+            return QFile::copy(source, destination);
+        };
+
         if (m_useClone) {
             FS::clone folderClone(m_origInstance->instanceRoot(), m_stagingPath);
             folderClone.matcher(m_matcher);
@@ -110,7 +135,7 @@ void InstanceCopyTask::executeTask()
                         there_were_errors |= !(*savesCopy)();
                     }
 
-                    return got_priv_results && !there_were_errors;
+                    return got_priv_results && !there_were_errors && copyModCategories();
                 }
 #else
                 qDebug() << "Link Failed!" << folderLink.getOSError().value() << folderLink.getOSError().message().c_str();
@@ -122,7 +147,7 @@ void InstanceCopyTask::executeTask()
                 there_were_errors |= !(*savesCopy)();
             }
 
-            return !there_were_errors;
+            return !there_were_errors && copyModCategories();
         }
         FS::copy folderCopy(m_origInstance->instanceRoot(), m_stagingPath);
         folderCopy.matcher(m_matcher);

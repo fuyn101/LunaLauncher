@@ -156,6 +156,44 @@ launcher_logic = static_library(
   cpp_pch: get_option('use_pch') ? ['include/base.pch.hpp', 'include/qtcore.pch.hpp', 'include/qtgui.pch.hpp'] : [],
 )
 
+launcher_logic_dep = declare_dependency(
+  link_with: launcher_logic,
+  include_directories: [
+    launcher_inc,
+    launcher_minecraft_inc,
+    quickjs_inc,
+    qtermwidget_inc,
+    simplewebp_inc,
+  ],
+  dependencies: [
+    murmur2_dep,
+    libnbt_dep,
+    qdcss_dep,
+    simplewebp_dep,
+    quickjs_dep,
+    buildconfig_dep,
+    qt_core_dep,
+    qt_widgets_dep,
+    qt_network_dep,
+    qt_networkauth_dep,
+    qt_concurrent_dep,
+    qt_websockets_dep,
+    qt_xml_dep,
+    qt_gui_dep,
+    qt_opengl_dep,
+    qtermwidget_dep,
+    libcmark_dep,
+    localpeer_dep,
+    rainbow_dep,
+    zlib_dep,
+    libarchive_dep,
+    tomlplusplus_dep,
+    libqrencode_dep,
+    gamemode_dep,
+  ],
+  compile_args: launcher_logic_args,
+)
+
 launcher_main_sources = ['main.cpp']
 if is_windows
   launcher_main_sources += windows.compile_resources(launcher_windows_rc_file)

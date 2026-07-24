@@ -331,6 +331,10 @@ set(MINECRAFT_SOURCES
     minecraft/mod/Mod.cpp
     minecraft/mod/ModDependency.h
     minecraft/mod/ModDetails.h
+    minecraft/mod/ModCategoryStore.h
+    minecraft/mod/ModCategoryStore.cpp
+    minecraft/mod/ModCategoryProxyModel.h
+    minecraft/mod/ModCategoryProxyModel.cpp
     minecraft/mod/ModVersionRange.h
     minecraft/mod/ModVersionRange.cpp
     minecraft/mod/ModFolderModel.h

@@ -24,6 +24,9 @@ ecm_add_test(BMCLAPICompareTest.cpp LINK_LIBRARIES Launcher_logic Qt${QT_VERSION
 ecm_add_test(ResourceFolderModel_test.cpp LINK_LIBRARIES Launcher_logic Qt${QT_VERSION_MAJOR}::Test
     TEST_NAME ResourceFolderModel)
 
+ecm_add_test(ModCategory_test.cpp LINK_LIBRARIES Launcher_logic Qt${QT_VERSION_MAJOR}::Test
+    TEST_NAME ModCategory)
+
 ecm_add_test(ResourcePackParse_test.cpp LINK_LIBRARIES Launcher_logic Qt${QT_VERSION_MAJOR}::Test
     TEST_NAME ResourcePackParse)
 

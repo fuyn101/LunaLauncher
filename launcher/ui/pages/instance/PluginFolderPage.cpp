@@ -68,7 +68,7 @@ void PluginFolderPage::updateFrame(const QModelIndex& current, [[maybe_unused]] 
         return;
     }
 
-    auto sourceCurrent = m_filterModel->mapToSource(current);
+    auto sourceCurrent = mapToResourceModel(current);
     if (!sourceCurrent.isValid()) {
         return;
     }
@@ -83,7 +83,7 @@ void PluginFolderPage::updateFrame(const QModelIndex& current, [[maybe_unused]] 
     ui->frame->updateWithPlugin(*plugin);
 }
 
-void PluginFolderPage::removeItems(const QItemSelection& selection)
+void PluginFolderPage::removeItems(const QModelIndexList& selection)
 {
     if (m_instance != nullptr && m_instance->isRunning()) {
         auto response = CustomMessageBox::selectable(this, tr("Confirm Delete"),
@@ -95,7 +95,7 @@ void PluginFolderPage::removeItems(const QItemSelection& selection)
         if (response != QMessageBox::Yes)
             return;
     }
-    m_model->deleteResources(selection.indexes());
+    m_model->deleteResources(selection);
 }
 
 void PluginFolderPage::downloadPlugins()
@@ -178,8 +178,7 @@ void PluginFolderPage::downloadDialogFinished(int result)
 
 void PluginFolderPage::deletePluginMetadata()
 {
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
-    m_model->deleteMetadata(selection);
+    m_model->deleteMetadata(selectedResourceRows());
 }
 
 void PluginFolderPage::exportPluginMetadata()

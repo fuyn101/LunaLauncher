@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QAbstractProxyModel>
 #include <QSortFilterProxyModel>
 
 #include "Application.h"
@@ -20,7 +21,10 @@ class ExternalResourcesPage : public QMainWindow, public BasePage {
     Q_OBJECT
 
    public:
-    explicit ExternalResourcesPage(BaseInstance* instance, ResourceFolderModel* model, QWidget* parent = nullptr);
+    explicit ExternalResourcesPage(BaseInstance* instance,
+                                   ResourceFolderModel* model,
+                                   QWidget* parent = nullptr,
+                                   QAbstractProxyModel* viewProxy = nullptr);
     virtual ~ExternalResourcesPage();
 
     virtual QString displayName() const override = 0;
@@ -51,7 +55,7 @@ class ExternalResourcesPage : public QMainWindow, public BasePage {
 
     virtual void addItem();
     void removeItem();
-    virtual void removeItems(const QItemSelection& selection);
+    virtual void removeItems(const QModelIndexList& selection);
 
     virtual void enableItem();
     virtual void disableItem();
@@ -65,11 +69,16 @@ class ExternalResourcesPage : public QMainWindow, public BasePage {
     void ShowHeaderContextMenu(const QPoint& pos);
 
    protected:
+    QModelIndex mapToResourceModel(const QModelIndex& index) const;
+    QModelIndexList selectedResourceRows() const;
+    bool hasViewSelection() const;
+
     BaseInstance* m_instance = nullptr;
 
     Ui::ExternalResourcesPage* ui = nullptr;
     ResourceFolderModel* m_model;
     QSortFilterProxyModel* m_filterModel = nullptr;
+    QAbstractItemModel* m_viewModel = nullptr;
 
     QString m_fileSelectionFilter;
     QString m_viewFilter;
