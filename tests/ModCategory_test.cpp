@@ -214,6 +214,10 @@ class ModCategoryTest : public QObject {
         ModCategoryProxyModel categories(instance.path(), "minecraft/mods", &model);
         categories.setSourceModel(filter);
 
+        QCOMPARE(model.index(0, ModFolderModel::NameColumn).data(Qt::DisplayRole).toString(), QStringLiteral("alpha"));
+        QCOMPARE(filter->index(0, ModFolderModel::NameColumn).data(Qt::DisplayRole).toString(), QStringLiteral("alpha"));
+        QCOMPARE(categories.index(0, ModFolderModel::NameColumn).data(Qt::DisplayRole).toString(), QStringLiteral("alpha (alpha.jar)"));
+
         const auto category = categories.addCategory("Gameplay");
         QVERIFY(!category.isEmpty());
         QCOMPARE(categories.rowCount(), 4);
@@ -248,6 +252,32 @@ class ModCategoryTest : public QObject {
         for (int row = 1; row < categories.rowCount(); ++row) {
             QVERIFY(categories.mapToSource(categories.index(row, 0)).isValid());
         }
+    }
+
+    void displayNameIncludesDisabledFileSuffix()
+    {
+        QTemporaryDir instance;
+        QVERIFY(instance.isValid());
+        const auto modsPath = QDir(instance.path()).absoluteFilePath("minecraft/mods");
+        QVERIFY(QDir().mkpath(modsPath));
+        const auto filePath = QDir(modsPath).absoluteFilePath("example.jar.disabled");
+        QFile file(filePath);
+        QVERIFY(file.open(QIODevice::WriteOnly));
+        file.close();
+
+        TestModFolderModel model(modsPath);
+        auto mod = model.addMod(filePath, "example");
+        auto details = mod->details();
+        details.name = "Example Mod";
+        mod->setDetails(details);
+
+        auto filter = model.createFilterProxyModel(this);
+        filter->setSourceModel(&model);
+        ModCategoryProxyModel categories(instance.path(), "minecraft/mods", &model);
+        categories.setSourceModel(filter);
+
+        QCOMPARE(categories.index(0, ModFolderModel::NameColumn).data(Qt::DisplayRole).toString(),
+                 QStringLiteral("Example Mod (example.jar.disabled)"));
     }
 };
 

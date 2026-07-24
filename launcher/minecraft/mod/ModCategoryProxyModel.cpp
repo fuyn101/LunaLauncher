@@ -108,7 +108,22 @@ QVariant ModCategoryProxyModel::data(const QModelIndex& index, int role) const
     }
 
     const auto sourceIndex = mapToSource(index);
-    return sourceIndex.isValid() ? sourceModel()->data(sourceIndex, role) : QVariant{};
+    if (!sourceIndex.isValid()) {
+        return {};
+    }
+
+    if (role == Qt::DisplayRole && index.column() == ModFolderModel::NameColumn) {
+        const auto displayName = sourceModel()->data(sourceIndex, role).toString();
+        const auto mod = modForSource(sourceIndex);
+        if (mod && !displayName.isEmpty()) {
+            const auto fileName = mod->fileinfo().fileName();
+            if (!fileName.isEmpty()) {
+                return tr("%1 (%2)").arg(displayName, fileName);
+            }
+        }
+    }
+
+    return sourceModel()->data(sourceIndex, role);
 }
 
 bool ModCategoryProxyModel::setData(const QModelIndex& index, const QVariant& value, int role)
