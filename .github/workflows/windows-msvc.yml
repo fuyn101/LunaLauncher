@@ -101,18 +101,15 @@ jobs:
         if: ${{ always() }}
         shell: pwsh
         run: pixi run ccache --show-stats
-      - name: Prepare portable package
+      - name: Add portable mode marker template
         shell: pwsh
         run: |
-          Copy-Item -Path install -Destination install-portable -Recurse
-          New-Item -ItemType File -Path install-portable\portable.txt -Force
+          Copy-Item -Path program_info\portable.txt -Destination install\portable.txt.example
       - name: Upload artifacts
         uses: actions/upload-artifact@v6
         with:
           name: Windows-MSVC-${{ github.sha }}-${{ inputs.build_type || 'Release' }}
-          path: |
-            install/**
-            install-portable/**
+          path: install/**
       - name: Prepare release metadata
         id: release_meta
         if: ${{ inputs.publish_release }}
@@ -134,11 +131,8 @@ jobs:
           $version = "${{ steps.release_meta.outputs.version }}"
           $buildType = "${{ inputs.build_type || 'Release' }}"
           $zip1 = "PrismLauncher-Windows-MSVC-$version-$buildType.zip"
-          $zip2 = "PrismLauncher-Windows-MSVC-Portable-$version-$buildType.zip"
           if (Test-Path $zip1) { Remove-Item -Force $zip1 }
-          if (Test-Path $zip2) { Remove-Item -Force $zip2 }
           Compress-Archive -Path "install\*" -DestinationPath $zip1 -Force
-          Compress-Archive -Path "install-portable\*" -DestinationPath $zip2 -Force
       - name: Publish GitHub Release
         if: ${{ inputs.publish_release }}
         uses: softprops/action-gh-release@v2
@@ -150,4 +144,3 @@ jobs:
           prerelease: ${{ inputs.prerelease }}
           files: |
             PrismLauncher-Windows-MSVC-${{ steps.release_meta.outputs.version }}-${{ inputs.build_type || 'Release' }}.zip
-            PrismLauncher-Windows-MSVC-Portable-${{ steps.release_meta.outputs.version }}-${{ inputs.build_type || 'Release' }}.zip

@@ -107,10 +107,8 @@ jobs:
           if [ "${{ inputs.enable_windows_msvc }}" = "true" ]; then
             windows_dir="$(ls -d Windows-MSVC-* | head -n 1)"
             test -n "$windows_dir"
-            (cd "$windows_dir" && zip -r -9 "../PrismLauncher-Windows-MSVC-${version}-${build_type}.zip" install)
-            (cd "$windows_dir" && zip -r -9 "../PrismLauncher-Windows-MSVC-Portable-${version}-${build_type}.zip" install-portable)
+            (cd "$windows_dir" && zip -r -9 "../PrismLauncher-Windows-MSVC-${version}-${build_type}.zip" .)
             files+=("PrismLauncher-Windows-MSVC-${version}-${build_type}.zip")
-            files+=("PrismLauncher-Windows-MSVC-Portable-${version}-${build_type}.zip")
           fi
 
           if [ "${{ inputs.enable_windows_gcc }}" = "true" ]; then
