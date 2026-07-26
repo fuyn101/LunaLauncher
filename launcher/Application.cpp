@@ -711,6 +711,7 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         m_settings->registerSetting("IconTheme", QString());
         m_settings->registerSetting("ApplicationTheme", QString());
         m_settings->registerSetting("BackgroundCat", QString("kitteh"));
+        m_settings->registerSetting("BackgroundImage", QString());
 
         // Remembered state
         m_settings->registerSetting("LastUsedGroupForNewInstance", QString());
@@ -891,6 +892,11 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         m_settings->registerSetting("TheCat", false);
         m_settings->registerSetting("CatOpacity", 100);
         m_settings->registerSetting("CatFit", "fit");
+
+        // The custom background
+        m_settings->registerSetting("BackgroundEnabled", false);
+        m_settings->registerSetting("BackgroundOpacity", 100);
+        m_settings->registerSetting("BackgroundFit", "fit");
 
         m_settings->registerSetting("StatusBarVisible", true);
         m_settings->registerSetting("ShowNewsBar", true);

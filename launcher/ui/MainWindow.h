@@ -43,6 +43,7 @@
 #include <memory>
 
 #include <QMainWindow>
+#include <QPixmap>
 #include <QProcess>
 #include <QTimer>
 
@@ -98,6 +99,7 @@ class MainWindow : public QMainWindow {
 
    protected:
     QMenu* createPopupMenu() override;
+    void paintEvent(QPaintEvent* event) override;
 
    private slots:
     void onCatToggled(bool);
@@ -239,6 +241,8 @@ class MainWindow : public QMainWindow {
     void addInstance(const QString& url = QString(), const QMap<QString, QString>& extra_info = {});
     void activateInstance(BaseInstance* instance);
     void setCatBackground(bool enabled);
+    void refreshBackground();
+    void setBackgroundTransparency(bool enabled);
     void updateInstanceToolIcon(QString new_icon);
     void setSelectedInstanceById(const QString& id);
     void updateStatusCenter();
@@ -257,6 +261,7 @@ class MainWindow : public QMainWindow {
     Ui::MainWindow* ui;
     // these are managed by Qt's memory management model!
     InstanceView* view = nullptr;
+    QPixmap m_backgroundImage;
     InstanceProxyModel* proxymodel = nullptr;
     QToolButton* newsLabel = nullptr;
     QLabel* m_statusLeft = nullptr;
@@ -288,4 +293,12 @@ class MainWindow : public QMainWindow {
     // no extra toolbar, reuse mainToolBar docked vertically for new UI
     WideBar* m_serverToolBar = nullptr;
     ServerPreviewWidget* m_serverPreviewWidget = nullptr;
+    bool m_backgroundTransparent = false;
+    bool m_viewAutoFillBackground = true;
+    QString m_centralWidgetStyle;
+    QString m_viewportStyle;
+    QString m_mainToolBarStyle;
+    QString m_instanceToolBarStyle;
+    QString m_newsToolBarStyle;
+    QString m_serverToolBarStyle;
 };

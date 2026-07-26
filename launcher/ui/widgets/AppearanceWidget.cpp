@@ -38,8 +38,12 @@
 #include "ui_AppearanceWidget.h"
 
 #include <DesktopServices.h>
+#include <QFile>
 #include <QGraphicsOpacityEffect>
+#include <QImageReader>
+#include <QMessageBox>
 #include "BuildConfig.h"
+#include "ui/GuiUtil.h"
 #include "ui/themes/ITheme.h"
 #include "ui/themes/ThemeManager.h"
 
@@ -59,6 +63,7 @@ AppearanceWidget::AppearanceWidget(bool themesOnly, QWidget* parent)
         m_ui->catPackLabel->hide();
         m_ui->catPackComboBox->hide();
         m_ui->catPackFolder->hide();
+        m_ui->backgroundBox->hide();
         m_ui->settingsBox->hide();
         m_ui->consolePreview->hide();
         m_ui->catPreview->hide();
@@ -85,6 +90,10 @@ AppearanceWidget::AppearanceWidget(bool themesOnly, QWidget* parent)
             [] { DesktopServices::openPath(APPLICATION->themeManager()->getApplicationThemesFolder().path()); });
     connect(m_ui->catPackFolder, &QPushButton::clicked, this,
             [] { DesktopServices::openPath(APPLICATION->themeManager()->getCatPacksFolder().path()); });
+    connect(m_ui->selectBackgroundButton, &QPushButton::clicked, this, &AppearanceWidget::selectBackground);
+    connect(m_ui->clearBackgroundButton, &QPushButton::clicked, this, &AppearanceWidget::clearBackground);
+    connect(m_ui->backgroundFolderButton, &QPushButton::clicked, this,
+            [] { DesktopServices::openPath(APPLICATION->themeManager()->getBackgroundsFolder().path()); });
     connect(m_ui->reloadThemesButton, &QPushButton::pressed, this, &AppearanceWidget::loadThemeSettings);
 }
 
@@ -102,6 +111,12 @@ void AppearanceWidget::applySettings()
     settings->set("CatOpacity", m_ui->catOpacitySlider->value());
     auto catFit = m_ui->catFitComboBox->currentIndex();
     settings->set("CatFit", catFit == 0 ? "fit" : catFit == 1 ? "fill" : "strech");
+
+    settings->set("BackgroundImage", m_backgroundImage);
+    settings->set("BackgroundEnabled", m_ui->backgroundEnabledCheckBox->isChecked() && !m_backgroundImage.isEmpty());
+    settings->set("BackgroundOpacity", m_ui->backgroundOpacitySlider->value());
+    auto backgroundFit = m_ui->backgroundFitComboBox->currentIndex();
+    settings->set("BackgroundFit", backgroundFit == 0 ? "fit" : backgroundFit == 1 ? "fill" : "stretch");
 }
 
 void AppearanceWidget::loadSettings()
@@ -122,6 +137,17 @@ void AppearanceWidget::loadSettings()
 
     auto catFit = settings->get("CatFit").toString();
     m_ui->catFitComboBox->setCurrentIndex(catFit == "fit" ? 0 : catFit == "fill" ? 1 : 2);
+
+    m_backgroundImage = settings->get("BackgroundImage").toString();
+    const QFileInfo backgroundInfo(m_backgroundImage);
+    const QString backgroundPath = backgroundInfo.isAbsolute()
+                                       ? m_backgroundImage
+                                       : APPLICATION->themeManager()->getBackgroundsFolder().filePath(m_backgroundImage);
+    m_ui->backgroundPathEdit->setText(m_backgroundImage.isEmpty() ? QString() : QDir::toNativeSeparators(backgroundPath));
+    m_ui->backgroundEnabledCheckBox->setChecked(settings->get("BackgroundEnabled").toBool());
+    m_ui->backgroundOpacitySlider->setValue(settings->get("BackgroundOpacity").toInt());
+    auto backgroundFit = settings->get("BackgroundFit").toString();
+    m_ui->backgroundFitComboBox->setCurrentIndex(backgroundFit == "fit" ? 0 : backgroundFit == "fill" ? 1 : 2);
 }
 
 void AppearanceWidget::retranslateUi()
@@ -224,6 +250,69 @@ void AppearanceWidget::loadThemeSettings()
     m_ui->iconsComboBox->blockSignals(false);
     m_ui->widgetStyleComboBox->blockSignals(false);
     m_ui->catPackComboBox->blockSignals(false);
+}
+
+void AppearanceWidget::selectBackground()
+{
+    QStringList patterns;
+    for (const auto& format : QImageReader::supportedImageFormats()) {
+        patterns.append("*." + QString::fromLatin1(format).toLower());
+    }
+    patterns.removeDuplicates();
+    patterns.sort();
+
+    const QString sourcePath = GuiUtil::BrowseForFile("background-image", tr("Select Background Image"),
+                                                      tr("Images (%1)").arg(patterns.join(' ')), QString(), this);
+    if (sourcePath.isEmpty()) {
+        return;
+    }
+
+    QImageReader reader(sourcePath);
+    if (!reader.canRead()) {
+        QMessageBox::warning(this, tr("Background Import Failed"), tr("The selected file is not a readable image."));
+        return;
+    }
+
+    QDir backgroundDir = APPLICATION->themeManager()->getBackgroundsFolder();
+    if (!backgroundDir.mkpath(".")) {
+        QMessageBox::warning(this, tr("Background Import Failed"), tr("Could not create the backgrounds folder."));
+        return;
+    }
+
+    const QFileInfo sourceInfo(sourcePath);
+    QString destinationPath;
+    if (sourceInfo.absoluteDir().canonicalPath() == backgroundDir.canonicalPath()) {
+        destinationPath = sourceInfo.absoluteFilePath();
+    } else {
+        QString suffix = sourceInfo.suffix().toLower();
+        if (suffix.isEmpty()) {
+            suffix = QString::fromLatin1(reader.format()).toLower();
+        }
+
+        const QString baseName = sourceInfo.completeBaseName();
+        QString fileName = baseName + "." + suffix;
+        for (int copy = 2; QFileInfo::exists(backgroundDir.filePath(fileName)); ++copy) {
+            fileName = QString("%1-%2.%3").arg(baseName).arg(copy).arg(suffix);
+        }
+        destinationPath = backgroundDir.filePath(fileName);
+
+        if (!QFile::copy(sourcePath, destinationPath)) {
+            QMessageBox::warning(this, tr("Background Import Failed"),
+                                 tr("Could not copy the selected image to the backgrounds folder."));
+            return;
+        }
+    }
+
+    m_backgroundImage = QFileInfo(destinationPath).fileName();
+    m_ui->backgroundPathEdit->setText(QDir::toNativeSeparators(destinationPath));
+    m_ui->backgroundEnabledCheckBox->setChecked(true);
+}
+
+void AppearanceWidget::clearBackground()
+{
+    m_backgroundImage.clear();
+    m_ui->backgroundPathEdit->clear();
+    m_ui->backgroundEnabledCheckBox->setChecked(false);
 }
 
 void AppearanceWidget::updateConsolePreview()
