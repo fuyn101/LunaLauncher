@@ -43,6 +43,9 @@ jobs:
     runs-on: windows-2022
     env:
       BUILD_TYPE: ${{ inputs.build_type || 'Release' }}
+      CCACHE_DIR: ${{ github.workspace }}\.ccache
+      CCACHE_MAXSIZE: 1G
+      CCACHE_COMPRESS: true
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -57,13 +60,37 @@ jobs:
         uses: prefix-dev/setup-pixi@v0.10.0
         with:
           cache: true
+      - name: Cache Qt
+        uses: actions/cache@v4
+        with:
+          path: third_party/qt/6.10.1/msvc2022_64
+          key: windows-msvc-qt-6.10.1-websockets-networkauth-multimedia-v1
+      - name: Cache Meson wrap downloads
+        uses: actions/cache@v4
+        with:
+          path: subprojects/packagecache
+          key: windows-msvc-meson-wraps-${{ hashFiles('subprojects/*.wrap', 'subprojects/packagefiles/**') }}
+      - name: Cache compiler outputs
+        uses: actions/cache@v4
+        with:
+          path: .ccache
+          key: windows-msvc-ccache-${{ env.BUILD_TYPE }}-${{ hashFiles('pixi.lock') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            windows-msvc-ccache-${{ env.BUILD_TYPE }}-${{ hashFiles('pixi.lock') }}-
+            windows-msvc-ccache-${{ env.BUILD_TYPE }}-
+            windows-msvc-ccache-
       - name: Build and install
         shell: pwsh
         env:
           LUNA_INSTALL_DIR: install
         run: |
           $profile = $env:BUILD_TYPE.ToLowerInvariant()
+          pixi run ccache --zero-stats
           pixi run install $profile
+      - name: Show compiler cache statistics
+        if: ${{ always() }}
+        shell: pwsh
+        run: pixi run ccache --show-stats
       - name: Prepare portable package
         shell: pwsh
         run: |
