@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - "fix/**"
+      - "feature/**"
       - all-features
   workflow_dispatch:
     inputs:
