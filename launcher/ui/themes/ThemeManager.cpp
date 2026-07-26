@@ -56,6 +56,8 @@ ThemeManager::ThemeManager()
 
     initializeThemes();
     initializeCatPacks();
+    if (!m_backgroundsFolder.mkpath("."))
+        themeWarningLog() << "Couldn't create backgrounds folder";
 }
 
 ThemeManager::~ThemeManager()
@@ -334,6 +336,11 @@ QDir ThemeManager::getApplicationThemesFolder()
 QDir ThemeManager::getCatPacksFolder()
 {
     return m_catPacksFolder;
+}
+
+QDir ThemeManager::getBackgroundsFolder()
+{
+    return m_backgroundsFolder;
 }
 
 void ThemeManager::setIconTheme(const QString& name)

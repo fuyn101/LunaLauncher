@@ -374,6 +374,108 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="backgroundBox">
+     <property name="title">
+      <string>Background</string>
+     </property>
+     <layout class="QVBoxLayout" name="backgroundLayout">
+      <item>
+       <widget class="QCheckBox" name="backgroundEnabledCheckBox">
+        <property name="text">
+         <string>Enable custom background</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="backgroundImageLayout">
+        <item>
+         <widget class="QLabel" name="backgroundImageLabel">
+          <property name="text">
+           <string>Image:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="backgroundPathEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="selectBackgroundButton">
+          <property name="text">
+           <string>Select...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="clearBackgroundButton">
+          <property name="text">
+           <string>Clear</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="backgroundFolderButton">
+          <property name="text">
+           <string>Open Folder</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="backgroundOptionsLayout">
+        <item>
+         <widget class="QLabel" name="backgroundOpacityLabel">
+          <property name="text">
+           <string>Opacity:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="backgroundOpacitySlider">
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="backgroundFitLabel">
+          <property name="text">
+           <string>Scaling:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="backgroundFitComboBox">
+          <item>
+           <property name="text">
+            <string>Fit</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Fill</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Stretch</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="previewBox">
      <property name="title">
       <string>Preview</string>
@@ -625,6 +727,13 @@
   <tabstop>fontSizeBox</tabstop>
   <tabstop>catFitComboBox</tabstop>
   <tabstop>catOpacitySlider</tabstop>
+  <tabstop>backgroundEnabledCheckBox</tabstop>
+  <tabstop>backgroundPathEdit</tabstop>
+  <tabstop>selectBackgroundButton</tabstop>
+  <tabstop>clearBackgroundButton</tabstop>
+  <tabstop>backgroundFolderButton</tabstop>
+  <tabstop>backgroundOpacitySlider</tabstop>
+  <tabstop>backgroundFitComboBox</tabstop>
   <tabstop>consolePreview</tabstop>
  </tabstops>
  <resources/>

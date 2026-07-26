@@ -48,6 +48,8 @@ class AppearanceWidget : public QWidget {
     void applyWidgetTheme(int index);
     void applyCatTheme(int index);
     void loadThemeSettings();
+    void selectBackground();
+    void clearBackground();
 
     void updateConsolePreview();
     void updateCatPreview();
@@ -55,4 +57,5 @@ class AppearanceWidget : public QWidget {
     Ui::AppearanceWidget* m_ui;
     QTextCharFormat m_defaultFormat;
     bool m_themesOnly;
+    QString m_backgroundImage;
 };

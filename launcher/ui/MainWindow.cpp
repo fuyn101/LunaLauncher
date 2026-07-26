@@ -68,6 +68,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPainter>
 #include <QProgressDialog>
 #include <QShortcut>
 #include <QStatusBar>
@@ -374,6 +375,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         setCatBackground(cat_enable);
     }
 
+    refreshBackground();
+
     // Togglable status bar
     {
         bool statusBarVisible = APPLICATION->settings()->get("StatusBarVisible").toBool();
@@ -561,6 +564,118 @@ QMenu* MainWindow::createPopupMenu()
 
     return filteredMenu;
 }
+
+void MainWindow::paintEvent(QPaintEvent* event)
+{
+    QMainWindow::paintEvent(event);
+    if (m_backgroundImage.isNull()) {
+        return;
+    }
+
+    QRect contentRect = rect();
+    if (menuBar()->isVisible()) {
+        contentRect.setTop(menuBar()->geometry().bottom() + 1);
+    }
+    if (statusBar()->isVisible()) {
+        contentRect.setBottom(statusBar()->geometry().top() - 1);
+    }
+    if (contentRect.isEmpty()) {
+        return;
+    }
+
+    const QString fit = APPLICATION->settings()->get("BackgroundFit").toString();
+    const qreal devicePixelRatio = devicePixelRatioF();
+    const QSize renderSize = (QSizeF(contentRect.size()) * devicePixelRatio).toSize();
+    QPixmap background;
+    if (fit == "stretch") {
+        background = m_backgroundImage.scaled(renderSize, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    } else if (fit == "fill") {
+        background = m_backgroundImage.scaled(renderSize, Qt::KeepAspectRatioByExpanding, Qt::FastTransformation);
+    } else {
+        background = m_backgroundImage.scaled(renderSize, Qt::KeepAspectRatio, Qt::FastTransformation);
+    }
+    background.setDevicePixelRatio(devicePixelRatio);
+
+    QRect targetRect(QPoint(), background.deviceIndependentSize().toSize());
+    targetRect.moveCenter(contentRect.center());
+
+    QPainter painter(this);
+    painter.setClipRect(contentRect);
+    painter.setOpacity(APPLICATION->settings()->get("BackgroundOpacity").toDouble() / 100.0);
+    painter.drawPixmap(targetRect.topLeft(), background);
+}
+
+void MainWindow::refreshBackground()
+{
+    m_backgroundImage = QPixmap();
+
+    const auto settings = APPLICATION->settings();
+    if (settings->get("BackgroundEnabled").toBool()) {
+        const QString configuredPath = settings->get("BackgroundImage").toString();
+        const QFileInfo backgroundInfo(configuredPath);
+        const QString backgroundPath = backgroundInfo.isAbsolute()
+                                           ? configuredPath
+                                           : APPLICATION->themeManager()->getBackgroundsFolder().filePath(configuredPath);
+        if (!configuredPath.isEmpty()) {
+            m_backgroundImage.load(backgroundPath);
+        }
+    }
+
+    const bool enabled = !m_backgroundImage.isNull();
+    setBackgroundTransparency(enabled);
+    update();
+    view->viewport()->update();
+}
+
+void MainWindow::setBackgroundTransparency(bool enabled)
+{
+    if (enabled && !m_backgroundTransparent) {
+        m_centralWidgetStyle = ui->centralWidget->styleSheet();
+        m_viewportStyle = view->viewport()->styleSheet();
+        m_viewAutoFillBackground = view->viewport()->autoFillBackground();
+        m_mainToolBarStyle = ui->mainToolBar->styleSheet();
+        m_instanceToolBarStyle = ui->instanceToolBar->styleSheet();
+        m_newsToolBarStyle = ui->newsToolBar->styleSheet();
+        if (m_serverToolBar) {
+            m_serverToolBarStyle = m_serverToolBar->styleSheet();
+        }
+    }
+
+    if (!enabled && m_backgroundTransparent) {
+        ui->centralWidget->setStyleSheet(m_centralWidgetStyle);
+        view->viewport()->setStyleSheet(m_viewportStyle);
+        view->viewport()->setAutoFillBackground(m_viewAutoFillBackground);
+        ui->mainToolBar->setStyleSheet(m_mainToolBarStyle);
+        ui->instanceToolBar->setStyleSheet(m_instanceToolBarStyle);
+        ui->newsToolBar->setStyleSheet(m_newsToolBarStyle);
+        if (m_serverToolBar) {
+            m_serverToolBar->setStyleSheet(m_serverToolBarStyle);
+        }
+        m_backgroundTransparent = false;
+        return;
+    }
+
+    if (!enabled) {
+        return;
+    }
+
+    const QColor panelColor = palette().color(QPalette::Window);
+    const QString panelStyle = QString("QToolBar { background-color: rgba(%1, %2, %3, 210); border: none; }")
+                                   .arg(panelColor.red())
+                                   .arg(panelColor.green())
+                                   .arg(panelColor.blue());
+    ui->centralWidget->setStyleSheet("background: transparent;");
+    view->viewport()->setStyleSheet("background: transparent;");
+    view->viewport()->setAutoFillBackground(false);
+    ui->mainToolBar->setStyleSheet(panelStyle);
+    ui->instanceToolBar->setStyleSheet(panelStyle);
+    ui->newsToolBar->setStyleSheet(panelStyle);
+    if (m_serverToolBar) {
+        m_serverToolBar->setStyleSheet(panelStyle);
+    }
+    m_backgroundTransparent = true;
+}
+
 void MainWindow::setStatusBarVisibility(bool state)
 {
     statusBar()->setVisible(state);
@@ -1378,6 +1493,7 @@ void MainWindow::globalSettingsClosed()
 
     ui->actionToggleStatusBar->setChecked(APPLICATION->settings()->get("StatusBarVisible").toBool());
     ui->newsToolBar->setVisible(APPLICATION->settings()->get("ShowNewsBar").toBool());
+    refreshBackground();
 
     // This needs to be done to prevent UI elements disappearing in the event the config is changed
     // but Prism Launcher exits abnormally, causing the window state to never be saved:
