@@ -71,17 +71,17 @@ jobs:
         with:
           cache: true
       - name: Cache Qt
-        uses: actions/cache@v4
+        uses: actions/cache@v5.0.4
         with:
           path: third_party/qt/6.10.1/msvc2022_64
           key: windows-msvc-qt-6.10.1-websockets-networkauth-multimedia-v1
       - name: Cache Meson wrap downloads
-        uses: actions/cache@v4
+        uses: actions/cache@v5.0.4
         with:
           path: subprojects/packagecache
           key: windows-msvc-meson-wraps-${{ hashFiles('subprojects/*.wrap', 'subprojects/packagefiles/**') }}
       - name: Cache compiler outputs
-        uses: actions/cache@v4
+        uses: actions/cache@v5.0.4
         with:
           path: .ccache
           key: windows-msvc-ccache-${{ env.BUILD_TYPE }}-${{ hashFiles('pixi.lock') }}-${{ github.run_id }}-${{ github.run_attempt }}
