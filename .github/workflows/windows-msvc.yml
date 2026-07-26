@@ -1,5 +1,14 @@
 name: Windows MSVC Build
+
+concurrency:
+  group: windows-msvc-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
+  push:
+    branches:
+      - "fix/**"
+      - all-features
   workflow_dispatch:
     inputs:
       build_type:
